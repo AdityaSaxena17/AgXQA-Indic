@@ -48,15 +48,15 @@ The tiny example is explicitly synthetic and must never appear in reported resea
 
 EM, native QA results, ablations, uncertainty estimates and error analysis are also pending. No improvement is asserted. `results/status.json` is a tracker, not an experiment output. Store real outputs with dataset/checkpoint hashes and evaluation version.
 
-## Team review and three-day plan
+## Team review and plan
 - Aditya Saxena: Hindi review; phase 6.
 - Dhiraj: Tamil review; phases 1 and 7.
 - Saunak: Bengali review; phases 2 and 3.
 - Aditya Pise: Marathi review; phases 4 and 5.
 
-Day 1: freeze schemas/splits, audit translations, acquire sources and baseline setup. Day 2: review data, implement/run baseline and multilingual experiments, build corpus and native QA. Day 3: finish feasible adaptation, integrate predictions and report measured results and unfinished work honestly. This is a relative three-day plan, not a claim of completion or a newly confirmed calendar deadline.
+Day 1: freeze schemas/splits, audit translations, acquire sources and baseline setup. Day 2: review data, implement/run baseline and multilingual experiments, build corpus and native QA. Day 3: finish feasible adaptation, integrate predictions and report measured results and unfinished work honestly. This is a relative  plan, not a claim of completion or a newly confirmed calendar deadline.
 
 ## Limitations, references and license
-Whitespace token F1 is a transparent starter metric with known Indic tokenization limits. Review coverage, translation provenance and data rights need verification. Compute availability may limit the three-day scope; optional RAG/agentic experiments are deferred. Record verified original AgXQA and model citations in `docs/references.md`. No publication DOI or citation is invented. Code license selection is pending owner decision; third-party data retain their original terms and are not automatically redistributable.
+Whitespace token F1 is a transparent starter metric with known Indic tokenization limits. Review coverage, translation provenance and data rights need verification. Compute availability may limit the day scope; optional RAG/agentic experiments are deferred. Record verified original AgXQA and model citations in `docs/references.md`. No publication DOI or citation is invented. Code license selection is pending owner decision; third-party data retain their original terms and are not automatically redistributable.
 
 See [contribution workflow](CONTRIBUTING.md).
