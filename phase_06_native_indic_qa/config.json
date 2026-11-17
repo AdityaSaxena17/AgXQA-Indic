@@ -1,0 +1,17 @@
+{
+  "phase": 6,
+  "status": "pending",
+  "seed": 42,
+  "languages": [
+    "hi",
+    "mr",
+    "bn",
+    "ta"
+  ],
+  "inputs": [],
+  "output_dir": "outputs/phase_06_native_indic_qa",
+  "model_id": null,
+  "model_revision": null,
+  "dataset_revision": null,
+  "notes": "Starter only. Resolve inputs and hyperparameters before execution."
+}

@@ -1,0 +1,8 @@
+# Evaluation protocol v1
+EM and F1 use NFC normalization, Unicode casefold, punctuation replaced by spaces, and collapsed whitespace. Token F1 uses multiset overlap and whitespace tokens; combining marks are retained, and English articles are not removed. Empty/empty scores 1, empty/nonempty scores 0. For multiple gold spans, maximize each metric over references. Report scores on a 0–100 scale. This is a transparent shared protocol, not a claim of compatibility with the original paper's scorer; record any baseline differences.
+
+Evaluation requires exactly one split and exactly one prediction for each (id, language). Missing, extra and duplicate predictions fail, preventing silent optimistic scores. Micro averages weight examples; macro averages weight languages equally. Language gap is English F1 minus target F1 in percentage points on matched IDs only, with paired counts.
+
+The starter cross-lingual consistency proxy is the percentage of complete question groups for which every evaluated language has EM=1. It measures joint correctness, not semantic agreement between translated answer strings. Incomplete groups are excluded with counts; single-language/zero-complete-group consistency is null. Compare models only with the same language set and IDs. Native unaligned QA may legitimately have no consistency score. A semantic-equivalence CLC metric remains future work.
+
+Keep test gold fixed, avoid tuning on test outcomes, and report review coverage and sample sizes. Statistical analysis and plots are explicit pending starters, not simulated evidence. CLI output refuses to overwrite an existing report. For reproducibility attach run/checkpoint metadata alongside the input hashes it records.

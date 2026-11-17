@@ -1,0 +1,6 @@
+# Optional starting points; resolve compatible versions and save an exact lock before experiments.
+torch
+transformers
+datasets
+accelerate
+sentencepiece

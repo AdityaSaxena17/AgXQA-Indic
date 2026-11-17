@@ -1,0 +1,4 @@
+# Human annotation and translation review
+Review Hindi (Aditya Saxena), Marathi (Aditya Pise), Bengali (Saunak), Tamil (Dhiraj). Keep raw machine output immutable; put corrected copies in human_reviewed/ and log changes. Preserve IDs and original train/validation/test membership across translations.
+
+Check semantic equivalence of question/context, agricultural terminology, units, fluency, factual grounding and exact answer spans. Offsets are Python Unicode character indexes in the stored context, not byte offsets; recompute after any context edit. Mark pending, approved or rejected; record reviewer, timestamp and rationale. Adjudicate disagreements with a second reviewer when available. Report actual reviewed/total counts and sampling method; never claim full review based on a sample. Native QA must originate in the native source, not an English translation.

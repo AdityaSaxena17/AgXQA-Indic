@@ -1,0 +1,25 @@
+{
+  "status": "pending",
+  "model_id": "FacebookAI/xlm-roberta-base",
+  "model_revision": null,
+  "seed": 42,
+  "train_languages": [
+    "en",
+    "hi",
+    "mr",
+    "bn",
+    "ta"
+  ],
+  "eval_languages": [
+    "en",
+    "hi",
+    "mr",
+    "bn",
+    "ta"
+  ],
+  "learning_rate": 2e-05,
+  "epochs": 3,
+  "max_length": 384,
+  "doc_stride": 128,
+  "notes": "Proposed defaults, not tuned or executed; pin model revision and resolve data paths."
+}

@@ -1,0 +1,2 @@
+{"id": "synthetic-001", "language": "en", "split": "test", "source_document_id": "synthetic-doc-001", "context": "The crop is rice.", "question": "What is the crop?", "answers": [{"text": "rice", "answer_start": 12}], "synthetic": true}
+{"id": "synthetic-001", "language": "hi", "split": "test", "source_document_id": "synthetic-doc-001", "context": "यह फसल धान है।", "question": "यह कौन सी फसल है?", "answers": [{"text": "धान", "answer_start": 7}], "synthetic": true}

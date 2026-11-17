@@ -1,0 +1,4 @@
+# Reproducibility checklist
+Record the repository commit, exact executed command, environment lock, Python/CUDA versions, hardware, seeds, model/tokenizer revisions, input SHA-256 hashes, split manifest and source permissions for every run. Store checkpoints externally and reference their hashes.
+
+Group every language variant of a question in the same official split. Preserve official AgXQA splits; do not reshuffle a test-only translated subset into training. Split native data by source document, and exclude all native test documents and near duplicates from MLM/QA training. The validator checks ID/document split conflicts within the supplied file; cross-file/corpus and semantic near-duplicate audits remain required. Evaluate the same frozen records and normalization for each compared model. For adaptation ablation hold QA data, tokenizer, budget and settings constant. Report multiple seeds/uncertainty when feasible; never infer significance from a single run.
