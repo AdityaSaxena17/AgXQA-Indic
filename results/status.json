@@ -1,8 +1,17 @@
 {
-  "status": "pending",
-  "measured_results": null,
+  "status": "partial",
+  "measured_results": {
+    "phase_1": "phase_01_original_baseline/results/baseline_results.json",
+    "evaluation_protocol": "squad_v1_english",
+    "agroberta_reimplementation": {
+      "exact_match": 54.24242424242424,
+      "f1": 78.22565449019338,
+      "test_count": 330
+    },
+    "shared_protocol_rescore": "phase_01_original_baseline/results/shared_protocol_results.json"
+  },
   "phases": {
-    "1": "pending",
+    "1": "partial_agroberta_measured_xlmr_pending",
     "2": "pending_review",
     "3": "pending",
     "4": "pending",

@@ -1,0 +1,19 @@
+experiment_status: proposed_not_run
+model_name: xlm-roberta-base
+task: extractive_qa
+dataset: msu-ceco/agxqa_v1
+dataset_revision: 9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c
+training:
+  epochs: 5
+  learning_rate: 3.0e-05
+  batch_size: 16
+  max_seq_length: 384
+  doc_stride: 128
+  weight_decay: 0.01
+  seed: 42
+evaluation:
+  metrics:
+  - exact_match
+  - f1
+notes: User-suggested starting configuration, not original-paper settings or a completed
+  experiment. Model revision must be pinned before execution.

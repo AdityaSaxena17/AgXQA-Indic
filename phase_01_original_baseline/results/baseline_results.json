@@ -1,0 +1,59 @@
+{
+  "phase": 1,
+  "phase_status": "partial",
+  "owner": "Saunak",
+  "reviewer": "Dhiraj",
+  "dataset": "msu-ceco/agxqa_v1",
+  "dataset_revision": "9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c",
+  "language": "en",
+  "test_count": 330,
+  "evaluation_protocol": "squad_v1_english",
+  "published_reference": {
+    "exact_match": 55.15,
+    "f1": 78.89
+  },
+  "before_finetuning": {
+    "exact_match": 36.666666666666664,
+    "f1": 64.14534639420037,
+    "total": 330,
+    "prediction_coverage": 330,
+    "scorer": "SQuAD 1.1; normalized EM; multiset token F1; independent best reference per metric"
+  },
+  "agroberta_reimplementation": {
+    "exact_match": 54.24242424242424,
+    "f1": 78.22565449019338,
+    "total": 330,
+    "prediction_coverage": 330,
+    "scorer": "SQuAD 1.1; normalized EM; multiset token F1; independent best reference per metric"
+  },
+  "difference_from_paper_percentage_points": {
+    "exact_match": -0.9075757575757564,
+    "f1": -0.6643455098066227
+  },
+  "training": {
+    "epochs": 20,
+    "optimizer_steps": 7900,
+    "selection_rule": "last completed checkpoint",
+    "training_time_seconds_monotonic": 5296.853332040831,
+    "device": "mps",
+    "parameter_counts": {
+      "total": 125541698,
+      "trainable": 896066,
+      "frozen": 124645632
+    },
+    "validation_loss_recorded": false
+  },
+  "authors_released_checkpoint_evaluation": {
+    "status": "unavailable_in_supplied_audit",
+    "original_trained_qa_weights_evaluated": false
+  },
+  "xlmr_english_training": {
+    "status": "not_run",
+    "checkpoint_url": null
+  },
+  "checkpoint_publication": {
+    "agroberta_status": "local_only_not_uploaded",
+    "agroberta_url": null
+  },
+  "claim_limit": "One fixed-seed reimplementation; 309/330 test contexts occur verbatim in train; original decoding settings unavailable."
+}

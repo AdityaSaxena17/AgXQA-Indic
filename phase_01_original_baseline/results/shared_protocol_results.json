@@ -1,0 +1,17 @@
+{
+  "protocol": "agxqa-indic-v1",
+  "method": "Metric-only rescore of frozen predictions using shared.metrics.best_scores; no gold-offset repair or model execution",
+  "paper_comparable": false,
+  "models": {
+    "final-test": {
+      "count": 330,
+      "exact_match": 51.515151515151516,
+      "f1": 78.23992845182055
+    },
+    "baseline-test": {
+      "count": 330,
+      "exact_match": 33.03030303030303,
+      "f1": 64.45245000215155
+    }
+  }
+}

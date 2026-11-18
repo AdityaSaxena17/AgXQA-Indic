@@ -1,0 +1,26 @@
+{
+  "model": "agroberta_reimplementation",
+  "protocol": "squad_v1_english",
+  "test_questions": 330,
+  "normalized_exact_answers": 179,
+  "nonexact_with_token_overlap": 134,
+  "nonexact_with_zero_token_overlap": 17,
+  "lowest_f1_nonexact_ids": [
+    "1169409",
+    "1169470",
+    "1183037",
+    "1170438",
+    "1185375",
+    "1174209",
+    "1181028",
+    "1172470",
+    "1181501",
+    "1184721",
+    "1173949",
+    "1185413",
+    "319",
+    "251",
+    "472"
+  ],
+  "limits": "Descriptive analysis of frozen predictions; no test-set tuning or removal of bad gold offsets."
+}

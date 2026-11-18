@@ -1,0 +1,49 @@
+model_name: msu-ceco/roberta-ft-on-agextcorpus-2023-12-10_v2
+task: extractive_qa
+experiment_status: completed
+dataset: msu-ceco/agxqa_v1
+dataset_revision: 9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c
+data_dir: data/agxqa_v1
+model:
+  family: agroberta_adapter
+  backbone: msu-ceco/roberta-ft-on-agextcorpus-2023-12-10_v2
+  backbone_revision: bdfdd689aede30b4d7d84cb6e267b98a88d58e40
+  adapter: AdapterHub/roberta-base_qa_squad1_pfeiffer
+  adapter_revision: 059c341c1e82b0b8e418d76a2c5113af41326310
+training:
+  epochs: 20
+  learning_rate: 5.0e-05
+  batch_size: 4
+  eval_batch_size: 4
+  gradient_accumulation_steps: 1
+  weight_decay: 0.02
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-08
+  max_grad_norm: 1.0
+  warmup_steps: 0
+  seed: 42
+  save_steps: 500
+  max_steps: null
+  train_limit: null
+  eval_limit: null
+  selection: last
+  invalid_train_answers: skip
+  optim: adamw_torch
+  lr_scheduler_type: linear
+  fp16: false
+  bf16: false
+  load_best_model_at_end: false
+preprocessing:
+  max_seq_length: 384
+  doc_stride: 128
+  padding: max_length
+  question_context_order: question_then_context
+evaluation:
+  protocol: squad_v1_english
+  metrics:
+  - exact_match
+  - f1
+  n_best: 20
+  max_answer_length: 30
+  allow_no_answer: false

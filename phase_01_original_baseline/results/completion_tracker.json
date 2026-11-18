@@ -1,0 +1,70 @@
+{
+  "phase_status": "partial",
+  "complete": 8,
+  "partial": 4,
+  "pending": 2,
+  "total": 14,
+  "items": [
+    {
+      "item": "Original paper and dataset references",
+      "status": "complete"
+    },
+    {
+      "item": "Dataset download and preprocessing code",
+      "status": "complete"
+    },
+    {
+      "item": "Dataset statistics",
+      "status": "complete"
+    },
+    {
+      "item": "AgRoBERTa checkpoint evaluation",
+      "status": "partial"
+    },
+    {
+      "item": "English XLM-R fine-tuning",
+      "status": "pending"
+    },
+    {
+      "item": "Training and evaluation scripts",
+      "status": "partial"
+    },
+    {
+      "item": "Actual hyperparameters and random seeds",
+      "status": "complete"
+    },
+    {
+      "item": "EM and F1 results for mandatory models",
+      "status": "partial"
+    },
+    {
+      "item": "Published vs reproduced comparison",
+      "status": "complete"
+    },
+    {
+      "item": "Question-wise test predictions",
+      "status": "complete"
+    },
+    {
+      "item": "Training logs",
+      "status": "complete"
+    },
+    {
+      "item": "Training and evaluation graphs",
+      "status": "partial"
+    },
+    {
+      "item": "Fine-tuned XLM-R checkpoint link",
+      "status": "pending"
+    },
+    {
+      "item": "Complete README",
+      "status": "complete"
+    }
+  ],
+  "notes": [
+    "Original authors QA weights unavailable; our reimplementation checkpoint was evaluated.",
+    "Scripts support the measured AgRoBERTa run; XLM-R training is not implemented/run.",
+    "Validation loss was not logged; its PNG is an availability notice, not a measured curve."
+  ]
+}

@@ -1,0 +1,3 @@
+# Recorded training environment, plus config parsing and result plotting.
+-r requirements-training-lock.txt
+matplotlib==3.10.8
