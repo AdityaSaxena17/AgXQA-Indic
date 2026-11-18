@@ -47,7 +47,7 @@ def run_translation(rows, audit, config, output, backend_factory, resume=False, 
     manifest_path = output/"run_manifest.json"
     signature = {"config_sha256":digest(config),"source_file_sha256":audit["file_sha256"],
                  "selected_rows":[{"id":r["id"],"split":r["split"],"source_row_sha256":r["source_row_sha256"]} for r in rows],
-                 "pipeline_source_sha256":{p.name:file_digest(p) for p in (PHASE/"pipeline.py",PHASE/"translation.py",PHASE/"indictrans_backend.py")}}
+                 "pipeline_source_sha256":{p.name:file_digest(p) for p in (PHASE/"pipeline.py",PHASE/"translation.py",PHASE/"indictrans_backend.py",PHASE/"model_artifacts.py")}}
     if manifest_path.exists():
         manifest = json.loads(manifest_path.read_text())
         if not resume or manifest["signature"] != signature:
@@ -60,7 +60,8 @@ def run_translation(rows, audit, config, output, backend_factory, resume=False, 
         manifest = {"signature":signature,"status":"initializing","started_utc":datetime.now(timezone.utc).isoformat(),
                     "configuration":config,
                     "invocation_arguments":sys.argv,"python":platform.python_version(),"platform":platform.platform(),
-                    "model_id":config["model_id"],"model_revision":config["model_revision"],"provider":"local_Hugging_Face_checkpoint",
+                    "model_id":config["model_id"],"model_revision":config["model_revision"],"provider":config["provider"],
+                    "backend":config["backend"],"quantization":config["quantization"],"base_model_id":config["base_model_id"],
                     "chat_prompt":None,"temperature":None,"api_token_consumption":None,"api_cost":None,
                     "expected_translated_qa_rows":len(rows)*4,"generated_rows":0,"human_reviewed_rows":0}
         write_json(manifest_path,manifest)
@@ -85,6 +86,7 @@ def run_translation(rows, audit, config, output, backend_factory, resume=False, 
                     record = {"original_id":source["id"],"language":language,"split":source["split"],
                               "source_row_sha256":source["source_row_sha256"],"model_id":config["model_id"],
                               "model_revision":config["model_revision"],"target_language_tag":target,
+                              "backend":config["backend"],"quantization":config["quantization"],"base_model_id":config["base_model_id"],
                               "attempt":old["attempt"]+1 if old else 1,"created_utc":datetime.now(timezone.utc).isoformat(),
                               "translations":{"context":"","question":"","answers":[]},"field_outputs":{},"generation_issues":[]}
                     try:

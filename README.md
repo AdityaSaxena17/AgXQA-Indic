@@ -14,14 +14,14 @@ This repository organizes seven experiments to study cross-lingual transfer, mul
 | Phase | Experiment | Owner | Status |
 |---|---|---|---|
 | 1 | [Reproduce the Original AgXQA Baseline](phase_01_original_baseline/README.md) | Saunak; review by Dhiraj | Partial: AgRoBERTa measured; English XLM-R pending |
-| 2 | [Create AgXQA-Indic](phase_02_multilingual_benchmark/README.md) | Saunak + language reviewers | IndicTrans2 200M workflow prepared; translation/review not run |
+| 2 | [Create AgXQA-Indic](phase_02_multilingual_benchmark/README.md) | Saunak + language reviewers | IndicTrans2 1B INT8 ONNX workflow prepared; translation/review not run |
 | 3 | [Multilingual Fine-Tuning and Cross-Lingual Evaluation](phase_03_multilingual_finetuning/README.md) | Saunak | Pending |
 | 4 | [Build Our Own Indic-AEC](phase_04_indic_aec_corpus/README.md) | Aditya Pise | Pending |
 | 5 | [Domain Adaptation Using Indic-AEC](phase_05_domain_adaptation/README.md) | Aditya Pise | Pending |
 | 6 | [Build a Native Indic Agricultural QA Dataset](phase_06_native_indic_qa/README.md) | Aditya Saxena | Pending |
 | 7 | [Final Comparative Evaluation](phase_07_comparative_evaluation/README.md) | Dhiraj | Pending |
 
-Phase 2 now implements the user-selected IndicTrans2 English→Indic distilled 200M workflow, with source auditing, immutable raw logs, answer alignment, native-review worksheets and a gated final build. No earlier Gemma/Gemini files were supplied or verified, and no new translation model has run. Model access and explicit run approval remain pending. Dhiraj's Phase 7 assignment follows the prior roadmap's allocation of the otherwise unspecified second phase.
+Phase 2 now implements the user-selected IndicTrans2 English→Indic 1B INT8 ONNX CPU workflow, with source auditing, immutable raw logs, answer alignment, native-review worksheets and a gated final build. No earlier Gemma/Gemini files were supplied or verified, and no new translation model has run. Pinned graph download and explicit run approval remain pending; the selected community export is public/ungated at preflight. Dhiraj's Phase 7 assignment follows the prior roadmap's allocation of the otherwise unspecified second phase.
 
 ## Workflow and datasets
 Phase 1 establishes the English baseline. Phase 2 produces aligned AgXQA-Indic records for phase 3 (3A English-only training; 3B multilingual training). Phase 4 builds Indic-AEC for phase 5 adaptation. Phase 6 reserves native documents and constructs native QA. Phase 7 compares frozen predictions. Phase 6 test documents must be excluded from phase 4/5 training.

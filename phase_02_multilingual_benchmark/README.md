@@ -2,11 +2,11 @@
 
 **Owner:** Saunak. **Preparation snapshot: 18 November 2026.** The English source audit and implementation are available. **IndicTrans2 translation has not run; zero translated QA records and zero human judgments have been produced.** The full multilingual benchmark and Phase 3/5 handoff remain pending. See [completion tracker](results/completion_tracker.json).
 
-The user selected **IndicTrans2 English→Indic, distilled 200M**. Earlier planning notes suggested Gemma/Gemini translations might exist; no such files or provenance were supplied or found in this checkout. Their settings and results are unknown. This implementation records a new local IndicTrans2 workflow. It does not retrospectively label any earlier output.
+The user selected **IndicTrans2 English→Indic 1B, dynamic INT8 ONNX**, replacing the earlier unexecuted 200M plan. Earlier planning notes suggested Gemma/Gemini translations might exist; no such files or provenance were supplied or found in this checkout. Their settings and results are unknown. This implementation records a local ONNX Runtime CPU workflow using the community export `hari31416/indictrans2-en-indic-1B-ONNX-int8` of `ai4bharat/indictrans2-en-indic-1B`. It does not retrospectively label any earlier output.
 
 ## 1. Objective
 
-Extend English AgXQA to Hindi, Marathi, Bengali and Tamil while preserving question identity, agricultural meaning, every gold-answer reference and official split membership. Deliver a validated parallel benchmark for extractive QA, with immutable machine output and traceable human corrections. A generated translation is a candidate, not evidence of human validation.
+Extend English AgXQA to Hindi, Marathi, Bengali and Tamil while preserving question identity, agricultural meaning, every gold-answer reference and official split membership. Deliver a validated parallel benchmark for extractive QA, with immutable machine output and traceable human corrections. A generated translation is a candidate, not evidence of human validation. The model change is configuration/implementation work; it is not approval to execute inference.
 
 ## 2. Original Dataset Description
 
@@ -29,11 +29,11 @@ English counts were verified from downloaded bytes. Indic counts are **targets**
 
 ## 4. Translation Methodology
 
-The checkpoint is a sequence-to-sequence translation model, accessed locally with Transformers and IndicTransToolkit. It uses source/target language conditioning, not a chat prompt. [translation_prompt.txt](prompts/translation_prompt.txt) records the exact planned conditioning procedure; chat prompt, API sampling temperature, paid API token consumption and API cost are not applicable (`null`). Execution duration is unmeasured until a run occurs.
+The checkpoint is a sequence-to-sequence translation model, accessed through its dynamic INT8 ONNX export with ONNX Runtime and IndicTransToolkit. Source and target tokenizers are loaded from the export's JSON files. Quantization was performed by the community exporter; this phase does not recalibrate or train weights. Its original base-weight revision is not identified, so `base_model_revision` is explicitly null. It uses source/target language conditioning, not a chat prompt. [translation_prompt.txt](prompts/translation_prompt.txt) records the exact planned conditioning procedure; chat prompt, API sampling temperature, paid API token consumption and API cost are not applicable (`null`). Execution duration is unmeasured until a run occurs.
 
 Translate each context, question and **all** answer strings independently. The same context is translated once per target language/configuration/runtime and reused through a SQLite cache. Sentence segmentation followed by whitespace segmentation keeps actual preprocessed tokenizer inputs within 256 tokens. No input truncation is allowed. This retains normalized source words, but chunk boundaries can reduce discourse coherence; reviewers must inspect full paragraphs. Answers and questions can also be chunked if they exceed the budget.
 
-Each segment records the normalized English text, preprocessed input, decoded model output, generated token IDs, postprocessed output, source/output token counts and length-cap flags. Joined translations and field-level records are appended to language JSONL files. NFC and whitespace cleanup happen in separate candidates, leaving raw records unchanged. Target generations reaching the cap are flagged for review, rather than assumed complete in meaning.
+Each segment records the normalized English text, preprocessed input, decoded model output, generated token IDs, postprocessed output, source/output token counts and length-cap flags. Decoding starts at token 2, generates at most 255 new tokens, stops after a generated EOS (2), and flags the cap if no EOS appears. Greedy decoding follows the inspected exporter helper; the earlier unrun five-beam setting is not used. Out-of-dictionary token IDs and non-finite logits fail explicitly rather than silently substituting text. Joined translations and field-level records are appended to language JSONL files. NFC and whitespace cleanup happen in separate candidates, leaving raw records unchanged. Target generations reaching the cap are flagged for review, rather than assumed complete in meaning.
 
 Answer alignment accepts a **single exact substring match** in the cleaned context. Missing or repeated matches retain their original answer index and all possible positions in `answer_alignment`, and require human correction. The pipeline neither picks an arbitrary repeated occurrence nor appends an answer to a context. Inflection and paraphrase can make independent answer translation difficult; the pilot will measure this limitation before full execution.
 
@@ -43,21 +43,23 @@ Unit translations are retried at most three times, with one- and two-second dela
 
 | Setting | Prepared value |
 |---|---|
-| Checkpoint | `ai4bharat/indictrans2-en-indic-dist-200M` |
-| Immutable revision | `2cfd0a20057756d756bf3e53528f492afc52f91a` |
-| Provider | Local Hugging Face Transformers |
+| Checkpoint | `hari31416/indictrans2-en-indic-1B-ONNX-int8` |
+| Base model | `ai4bharat/indictrans2-en-indic-1B`; original base revision unspecified by exporter |
+| Export format | Community dynamic INT8 ONNX, including external weight sidecars |
+| Immutable revision | `659294a223583c6bc8686facb8f0dc15d593b2d1` |
+| Provider | Local ONNX Runtime 1.27.0, CPUExecutionProvider |
 | Toolkit | IndicTransToolkit 1.1.1 |
-| Decoding | Beam search, 5 beams, one output, `do_sample=false` |
-| Input / output cap | 256 actual preprocessed input tokens / `max_length=256` output tokens |
-| Runtime | Float32, eager attention, 4 CPU threads |
-| Device | Auto: CUDA, then Apple MPS, then CPU; explicitly selectable |
-| Batch size | 4 **segments from one translation unit**, not four QA records |
+| Decoding | Greedy argmax, `num_beams=1`, one output, `do_sample=false` |
+| Input / output cap | 256 actual preprocessed input tokens / 256 total decoder tokens including its start token |
+| Runtime | Uploaded INT8 ONNX graphs, 4 intra-op CPU threads, 1 inter-op thread |
+| Device | CPU only; no MPS/CUDA/CoreML provider is selected |
+| Batch size | 1 segment; encoder, first-step decoder and cached decoder graphs |
 | Seed | 42; exact reproducibility across devices is not guaranteed |
-| Remote model code | `trust_remote_code=true`, pinned model/code revision |
+| Remote model code | None executed; explicit graph/JSON file allowlist and SHA-256 manifest |
 
 [translation_config.yaml](configs/translation_config.yaml) and [config.json](config.json) contain identical settings. The default CLI uses JSON so non-model checks need only Python's standard library. Requirements declare a candidate environment; **the full translation dependency environment and neural integration have not been executed or validated**. Run manifests will record actual package versions, Python/platform/device, invocation, code/input hashes and measured per-session/total execution seconds. They do not estimate unrecorded costs.
 
-The [official model](https://huggingface.co/ai4bharat/indictrans2-en-indic-dist-200M) is gated with automatic access after the account accepts its sharing conditions. No local Hugging Face token was configured at access preflight. The user must accept the conditions and authenticate locally; credentials must not be pasted into issues or committed. Model weights have not been downloaded by this phase. Downloading with `scripts/download_model.py` records file hashes without executing remote Python; inspect that pinned source before inference. The Mac/MPS path is a proposed setting, not a measured throughput or compatibility claim.
+The selected [community export](https://huggingface.co/hari31416/indictrans2-en-indic-1B-ONNX-int8) was public and ungated at preflight; a Hugging Face token is not required for public download. The official base checkpoint is separately gated. The downloader fetches only the pinned ONNX graphs, external weights and required JSON files, never repository Python. Every required file is hashed and verified before session creation. Weights have not been downloaded and actual CPU execution remains untested. A macOS arm64 Python 3.11 wheel for the exporter's ONNX Runtime 1.27.0 pin was verified in public package metadata; that wheel requires macOS 14+. Requirements are declared, not an installed/validated translation environment. The INT8 label is supplied by the exporter; graph tensors and translation quality have not yet been independently audited.
 
 ## 6. Dataset Construction Pipeline
 
@@ -147,13 +149,13 @@ The official dataset already overlaps across documents and verbatim contexts: **
 
 Files under `results/` include the source preflight, per-record automated audit, header-only human evaluation table, actual source issue counts, machine-readable completion tracker and five required plots. At this stage `language_distribution.png` shows prepared English/source counts, `error_distribution.png` shows source issue flags, and translation-quality/span-correction/review-outcome figures explicitly state that observations are unavailable. No illustrative scores from the brief are used.
 
-Preparation verification: **39 repository tests passed**, including 22 Phase 2 tests using synthetic data/fake translation backends and no neural execution. Shared synthetic validation/evaluation also passed. An actual source-only build preflight exited 2 and emitted no final files, correctly blocking missing translations and required source judgments. See [verification.json](results/verification.json); checkpoint loading, real MT, language-classifier integration and human review remain unrun.
+Preparation verification: **46 repository tests passed**, including 29 Phase 2 tests using synthetic data/fake translation backends and no neural execution. Shared synthetic validation/evaluation also passed. An actual source-only build preflight exited 2 and emitted no final files, correctly blocking missing translations and required source judgments. See [verification.json](results/verification.json); ONNX graph loading, real MT, language-classifier integration and human review remain unrun.
 
 After an actual run and review, regenerate reports from the preserved candidates and completed worksheets. The paired span plot will use the same accepted review-resolved IDs before/after; raw overall candidate validity and unresolved records remain in the report. This preparation is not a completed Phase 2 submission.
 
 ## 15. Limitations
 
-The selected model is gated and the Mac neural path remains untested. Model code is loaded from the pinned checkpoint using `trust_remote_code`; inspect downloaded files first. Chunked independent field translation can lose coherence or produce answers that do not match the context; the pilot and native review are essential. Heuristics cannot certify semantics, fluency, terminology or unit equivalence. Original source offsets and document overlap need explicit handling. Human review, multilingual generation, final build, rights/redistribution review and downstream handoff remain pending. Phase 1's English-trained XLM-R model is also still pending; Phase 2 does not satisfy that separate prerequisite for Experiment 3A.
+The selected community INT8 ONNX graphs and CPU path remain untested with actual model files. No repository Python is executed. ONNX sessions and external weight files can use substantially more RAM than the on-disk bundle size. Runtime and quality must be measured in a separately approved pilot. The source base-weight revision is unspecified, and greedy decoding differs from the earlier unrun five-beam proposal. Chunked independent field translation can lose coherence or produce answers that do not match the context; the pilot and native review are essential. Heuristics cannot certify semantics, fluency, terminology or unit equivalence. Original source offsets and document overlap need explicit handling. Human review, multilingual generation, final build, rights/redistribution review and downstream handoff remain pending. Phase 1's English-trained XLM-R model is also still pending; Phase 2 does not satisfy that separate prerequisite for Experiment 3A.
 
 ## 16. Reproducibility Instructions
 
@@ -176,27 +178,26 @@ python3 phase_02_multilingual_benchmark/scripts/translate.py --split validation 
 
 The last command prints the plan for **five English validation questions × four languages = 20 translated QA records** and loads no neural model. To reuse already downloaded English files, append `--source-dir /path/to/english-files` to each script. The default local source directory is ignored by Git. This preparation audit used the existing verified English files rather than downloading another dataset copy.
 
-Before model execution, the user must approve the run, accept the [checkpoint sharing conditions](https://huggingface.co/ai4bharat/indictrans2-en-indic-dist-200M), and authenticate locally using the environment's `hf auth login`. Do not send a token through chat. Download and inspect the pinned checkpoint without executing its Python:
+Before model execution, the user must explicitly approve the run. The selected community repository is public/ungated at preflight; token authentication is optional for this download. Download the pinned graph bundle separately without executing repository Python:
 
 ```sh
-phase_02_multilingual_benchmark/.venv/bin/hf auth login
-phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/download_model.py --output-dir phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-dist-200M
+phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/download_model.py --output-dir phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-1B-ONNX-int8
 ```
 
 **Only after explicit approval**, execute the pilot:
 
 ```sh
-phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/translate.py --run-model --split validation --limit 5 --device mps --local-model phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-dist-200M --output-dir phase_02_multilingual_benchmark/outputs/pilot/raw
+phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/translate.py --run-model --split validation --limit 5 --device cpu --local-model phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-1B-ONNX-int8 --output-dir phase_02_multilingual_benchmark/outputs/pilot/raw
 phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/clean_translations.py --raw-dir phase_02_multilingual_benchmark/outputs/pilot/raw --output-dir phase_02_multilingual_benchmark/outputs/pilot/candidates
 phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/dataset_statistics.py --raw-dir phase_02_multilingual_benchmark/outputs/pilot/raw --candidates-dir phase_02_multilingual_benchmark/outputs/pilot/candidates --results-dir phase_02_multilingual_benchmark/outputs/pilot/results --plots
 ```
 
-Inspect success/failure counts, output-length flags, alignment failures, sample fidelity and actual speed/memory. A pilot's 20 target rows are not a complete benchmark. Do not extrapolate quality from five questions. If MPS is unsupported, investigate and obtain approval for the revised CPU/runtime plan; do not mix devices in an existing raw run.
+Inspect success/failure counts, output-length flags, alignment failures, sample fidelity and actual speed/memory. A pilot's 20 target rows are not a complete benchmark. Do not extrapolate quality from five questions. If graph loading or CPU execution fails, inspect the recorded error and revise the plan before further inference; do not mix export/runtime versions in an existing raw run.
 
 The full-run commands below are **prepared and unexecuted**; running all splits needs its own approval after the pilot:
 
 ```sh
-phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/translate.py --run-model --split all --all-rows --device mps --local-model phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-dist-200M --output-dir data/agxqa_indic/raw_translations
+phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/translate.py --run-model --split all --all-rows --device cpu --local-model phase_02_multilingual_benchmark/.cache/indictrans2-en-indic-1B-ONNX-int8 --output-dir data/agxqa_indic/raw_translations
 phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/clean_translations.py
 phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/validate_schema.py
 phase_02_multilingual_benchmark/.venv/bin/python phase_02_multilingual_benchmark/scripts/validate_answer_spans.py
@@ -225,7 +226,9 @@ Saunak owns Phase 2, translation methodology, Bengali review and integration. Ad
 
 - [AgXQA dataset, pinned revision](https://huggingface.co/datasets/msu-ceco/agxqa_v1/tree/9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c).
 - [Original AgXQA authors' repository](https://github.com/MSU-CECO/agxqa_benchmark_v1).
-- [IndicTrans2 distilled English→Indic 200M checkpoint](https://huggingface.co/ai4bharat/indictrans2-en-indic-dist-200M/tree/2cfd0a20057756d756bf3e53528f492afc52f91a).
+- [Selected community INT8 ONNX checkpoint](https://huggingface.co/hari31416/indictrans2-en-indic-1B-ONNX-int8/tree/659294a223583c6bc8686facb8f0dc15d593b2d1).
+- [Official full-size base checkpoint](https://huggingface.co/ai4bharat/indictrans2-en-indic-1B).
+- [Inspected exporter inference interface](https://github.com/Hari31416/indictrans2-onnx-export/blob/c488d66bd1a59bcd419d246e6c2b85c17384d9bc/src/translate.py).
 - [IndicTrans2 official inference example, inspected source revision](https://github.com/AI4Bharat/IndicTrans2/blob/4f08e39cc6bf13cd62e2445dc725f22bff1a9219/huggingface_interface/example.py).
 - [IndicTransToolkit author repository, inspected source revision](https://github.com/VarunGumma/IndicTransToolkit/tree/3efb8418d0721b4ce267c2b3586899d313191357) and [1.1.1 package](https://pypi.org/project/indictranstoolkit/1.1.1/).
 - [langid.py author repository](https://github.com/saffsd/langid.py).

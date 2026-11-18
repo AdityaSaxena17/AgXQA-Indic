@@ -27,7 +27,7 @@ def run(command):
         parser.add_argument("--limit",type=int,default=5)
         parser.add_argument("--all-rows",action="store_true")
         parser.add_argument("--output-dir",type=Path)
-        parser.add_argument("--device",choices=["auto","cpu","mps","cuda"],default="auto")
+        parser.add_argument("--device",choices=["cpu"],default="cpu")
         parser.add_argument("--local-model",type=Path)
         parser.add_argument("--resume",action="store_true")
         parser.add_argument("--retry-failed",action="store_true")
@@ -68,12 +68,15 @@ def run(command):
         plan = {"model":config["model_id"],"model_revision":config["model_revision"],"source_rows":len(selected),
                 "translated_rows":len(selected)*4,"splits":dict(Counter(r["split"] for r in selected)),
                 "languages":config["target_language_tags"],"generation":config["generation"],
-                "model_executed":False,"access_requirement":"Accept the model's Hugging Face sharing conditions and authenticate locally, or supply an already-downloaded authorized checkpoint."}
+                "backend":config["backend"],"quantization":config["quantization"],"device":args.device,
+                "model_executed":False,"access_requirement":"The selected community ONNX repository is public and ungated at preflight. Download its pinned bundle separately and pass --local-model; no token is required for public access."}
         if not args.run_model:
             print(json.dumps(plan,indent=2))
             return
         if not args.output_dir:
             parser.error("--run-model requires an explicit fresh --output-dir; raw outputs are never overwritten")
+        if not args.local_model:
+            parser.error("--run-model requires --local-model from scripts/download_model.py; checkpoint download is a separate step")
         from .indictrans_backend import Backend
         from .translation import run_translation
         manifest = run_translation(selected,audit,config,args.output_dir,

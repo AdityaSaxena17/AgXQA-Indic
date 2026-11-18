@@ -277,7 +277,7 @@ def write_reports(source_rows, candidates, reviews, config, directory, raw_manif
     report = statistics(source_rows,candidates,reviews,config)
     report["translation_configuration"] = config
     report["execution_metadata"] = None if raw_manifest is None else {key:raw_manifest.get(key) for key in (
-        "status","model_id","model_revision","provider","started_utc","updated_utc","runtime",
+        "status","model_id","model_revision","provider","backend","quantization","base_model_id","started_utc","updated_utc","runtime",
         "last_session_elapsed_seconds_monotonic","total_recorded_execution_seconds","raw_files_sha256",
         "successful_unique_rows","observed_unique_rows","api_token_consumption","api_cost")}
     automated, coverage = validate_candidates(candidates,source_rows)

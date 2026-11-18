@@ -82,9 +82,15 @@ def load_config(path=None):
     if not re.fullmatch(r"[0-9a-f]{40}", config["model_revision"]):
         raise ValueError("The model revision must be an immutable commit SHA")
     if config["generation"]["do_sample"] or config["generation"]["num_return_sequences"] != 1:
-        raise ValueError("This benchmark configuration uses deterministic single-output beam decoding")
-    if config["runtime"]["dtype"] != "float32" or config["runtime"]["attention"] != "eager":
-        raise ValueError("This backend implements the documented float32/eager configuration")
+        raise ValueError("This benchmark configuration uses deterministic single-output decoding")
+    if config.get("backend") != "onnxruntime" or config.get("quantization") != "int8_dynamic":
+        raise ValueError("Select the documented INT8 ONNX backend")
+    if config["generation"]["num_beams"] != 1:
+        raise ValueError("The current ONNX decoder implements greedy decoding (num_beams=1)")
+    if config["runtime"]["device"] != "cpu" or config["runtime"]["batch_size"] != 1:
+        raise ValueError("The selected INT8 runtime uses CPU execution and batch size 1")
+    if min(config["generation"]["max_source_tokens"],config["generation"]["max_target_tokens"]) < 2:
+        raise ValueError("Source and total target token budgets must be at least two")
     if min(config["runtime"]["batch_size"],config["runtime"]["threads"],config["runtime"]["retry_attempts"]) < 1:
         raise ValueError("Batch size, threads, and retry attempts must be positive")
     return config
@@ -298,6 +304,8 @@ def clean_record(source, raw, use_langid=False):
     candidate = {"id": source["id"] + "_" + raw["language"], "original_id": source["id"],
                  "translation_status": raw["translation_status"],
                  "translation_provenance":{"model_id":raw["model_id"],"model_revision":raw["model_revision"],
+                                           "backend":raw.get("backend"),"quantization":raw.get("quantization"),
+                                           "base_model_id":raw.get("base_model_id"),
                                            "target_language_tag":raw["target_language_tag"]},
                  "language": raw["language"], "split": source["split"], "source_document_id": source["source_document_id"],
                  "source_document_id_kind": source["source_document_id_kind"],

@@ -7,7 +7,8 @@ import tempfile
 import unittest
 
 from phase_02_multilingual_benchmark import pipeline as p
-from phase_02_multilingual_benchmark.indictrans_backend import chunk_text
+from phase_02_multilingual_benchmark.indictrans_backend import Backend, chunk_text, cached_feed, greedy_tokens
+from phase_02_multilingual_benchmark.model_artifacts import MODEL_FILES, record_bundle, verify_bundle
 from phase_02_multilingual_benchmark.operations import assemble, statistics, validate_candidates, clean_translations, candidate_rows
 from phase_02_multilingual_benchmark.translation import run_translation
 
@@ -203,6 +204,70 @@ class ReviewTests(unittest.TestCase):
         result=statistics(rows,candidates,reviews,p.load_config())["cohens_kappa"]
         self.assertEqual(result[0]["paired_examples"],2)
         self.assertEqual(result[0]["cohens_kappa"],0)
+
+
+class ONNXBackendTests(unittest.TestCase):
+    def test_selected_configuration_is_pinned_int8_cpu(self):
+        config=p.load_config()
+        self.assertEqual(config["model_id"],"hari31416/indictrans2-en-indic-1B-ONNX-int8")
+        self.assertEqual(config["model_revision"],"659294a223583c6bc8686facb8f0dc15d593b2d1")
+        self.assertEqual(config["runtime"]["device"],"cpu")
+        self.assertEqual(config["generation"]["num_beams"],1)
+
+    def test_greedy_decoder_handles_start_equal_to_eos_and_cached_steps(self):
+        calls=[]
+        def step(previous,first):
+            calls.append((previous,first))
+            return 10 if first else 2
+        tokens,capped=greedy_tokens(step,2,2,256)
+        self.assertEqual(tokens,[2,10,2])
+        self.assertFalse(capped)
+        self.assertEqual(calls,[(2,True),(10,False)])
+
+    def test_greedy_decoder_respects_total_length_and_flags_missing_eos(self):
+        tokens,capped=greedy_tokens(lambda previous,first:10,2,2,4)
+        self.assertEqual(tokens,[2,10,10,10])
+        self.assertTrue(capped)
+        with self.assertRaises(ValueError):
+            greedy_tokens(lambda previous,first:-1,2,2,4)
+
+    def test_decoder_cache_maps_all_four_tensors_per_layer(self):
+        values=list(range(8))
+        feed=cached_feed(values,2)
+        self.assertEqual(feed["past_key_values.0.decoder.key"],0)
+        self.assertEqual(feed["past_key_values.1.encoder.value"],7)
+        self.assertEqual(len(feed),8)
+        with self.assertRaisesRegex(ValueError,"cache layout"):
+            cached_feed(values[:6],2)
+
+    def test_bundle_manifest_requires_external_weights_and_detects_changes(self):
+        config=p.load_config()
+        with tempfile.TemporaryDirectory() as temporary:
+            directory=Path(temporary)
+            for name in MODEL_FILES:
+                (directory/name).write_bytes(b"SYNTHETIC FILE, NOT MODEL WEIGHTS")
+            manifest=record_bundle(directory,config)
+            self.assertEqual(verify_bundle(directory,config),manifest)
+            (directory/"decoder_shared.onnx.data").write_bytes(b"SYNTHETIC CORRUPTION")
+            with self.assertRaisesRegex(ValueError,"checksum mismatch"):
+                verify_bundle(directory,config)
+
+    def test_incomplete_or_wrong_model_bundles_are_rejected(self):
+        config=p.load_config()
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError,"incomplete"):
+                record_bundle(temporary,config)
+            p.write_json(Path(temporary)/"source-manifest.json",{"repo":"wrong","revision":config["model_revision"]})
+            with self.assertRaisesRegex(ValueError,"repository/revision"):
+                verify_bundle(temporary,config)
+
+    def test_cpu_and_explicit_local_bundle_are_required_before_loading(self):
+        with self.assertRaisesRegex(ValueError,"CPUExecutionProvider"):
+            Backend(p.load_config(),device="mps")
+        with self.assertRaisesRegex(ValueError,"separately"):
+            Backend(p.load_config())
+        self.assertIn("encoder_model.onnx.data",MODEL_FILES)
+        self.assertFalse(any(name.endswith(".py") for name in MODEL_FILES))
 
 
 class RawRunTests(unittest.TestCase):

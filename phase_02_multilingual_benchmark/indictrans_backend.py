@@ -1,10 +1,11 @@
-"""IndicTrans2 backend. Neural loading happens only when Backend is instantiated."""
+"""IndicTrans2 INT8 ONNX backend; sessions load only on explicit model execution."""
 import importlib.metadata
 import json
 from pathlib import Path
 import re
 
-from .pipeline import canonical_text, file_digest
+from .pipeline import canonical_text
+from .model_artifacts import verify_bundle
 
 
 def chunk_text(text, budget, measure):
@@ -48,70 +49,126 @@ def chunk_text(text, budget, measure):
     return chunks
 
 
+def cached_feed(values, layers):
+    """The export exposes four KV tensors per layer, in decoder/encoder key/value order."""
+    if len(values) != 4*layers:
+        raise ValueError("Unexpected decoder KV-cache layout")
+    names = ("decoder.key","decoder.value","encoder.key","encoder.value")
+    return {f"past_key_values.{layer}.{name}":values[4*layer+offset]
+            for layer in range(layers) for offset,name in enumerate(names)}
+
+
+def greedy_tokens(step, start_id, eos_id, limit):
+    """Pure decoding control: start token counts toward the total output budget."""
+    if limit < 2:
+        raise ValueError("Total target budget must be at least two")
+    tokens = [start_id]
+    for index in range(limit-1):
+        token = step(tokens[-1], index == 0)
+        if type(token) is not int or token < 0:
+            raise ValueError("Decoder returned an invalid token ID")
+        tokens.append(token)
+        if token == eos_id:
+            return tokens, False
+    return tokens, True
+
+
 class Backend:
-    def __init__(self, config, device="auto", local_model=None):
-        import torch
-        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, set_seed
+    def __init__(self, config, device="cpu", local_model=None):
+        if device != "cpu":
+            raise ValueError("The selected INT8 ONNX backend uses CPUExecutionProvider")
+        if local_model is None:
+            raise ValueError("Download the pinned ONNX bundle separately and pass --local-model")
+        bundle = verify_bundle(local_model,config)
+        import numpy as np
+        import onnxruntime as ort
+        from tokenizers import Tokenizer
         try:
             from IndicTransToolkit import IndicProcessor
         except ImportError:
             from IndicTransToolkit.IndicTransToolkit import IndicProcessor
-        if importlib.metadata.version("indictranstoolkit") != config["toolkit_version"]:
-            raise ValueError("Install the pinned IndicTransToolkit version before translating")
-        torch.set_num_threads(config["runtime"]["threads"])
-        set_seed(config["seed"])
-        if device == "auto":
-            device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-        self.device = torch.device(device)
-        self.torch, self.config, self.Processor = torch, config, IndicProcessor
-        source = str(local_model) if local_model else config["model_id"]
-        revision = None if local_model else config["model_revision"]
-        if local_model and not Path(local_model).is_dir():
-            raise ValueError("--local-model must be a downloaded local checkpoint directory")
-        if local_model:
-            manifest = json.loads((Path(local_model)/"source-manifest.json").read_text())
-            if manifest["repo"] != config["model_id"] or manifest["revision"] != config["model_revision"]:
-                raise ValueError("Local checkpoint manifest does not match the selected model/revision")
-            if not all(file_digest(Path(local_model)/name) == expected for name,expected in manifest["files"].items()):
-                raise ValueError("Local checkpoint file hashes do not match its manifest")
-        self.tokenizer = AutoTokenizer.from_pretrained(source, revision=revision, code_revision=revision, trust_remote_code=True)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(source, revision=revision, code_revision=revision,
-                            trust_remote_code=True, torch_dtype=torch.float32, attn_implementation="eager").to(self.device)
-        self.model.eval()
-        self.processor = IndicProcessor(inference=True)
-        self.metadata = {"model_id":config["model_id"], "model_revision":config["model_revision"],
-                         "device":str(self.device), "dtype":"float32", "attention":"eager", "trust_remote_code":True,
-                         "local_model_supplied":bool(local_model),
-                         "packages":{p:importlib.metadata.version(p) for p in ("torch","transformers","indictranstoolkit","huggingface-hub","sentencepiece")}}
+        for package,expected in (("onnxruntime",config["onnxruntime_version"]),("indictranstoolkit",config["toolkit_version"])):
+            if importlib.metadata.version(package) != expected:
+                raise ValueError(f"Install pinned {package}=={expected} before translating")
+        self.np, self.config, self.Processor = np, config, IndicProcessor
+        directory = Path(local_model)
+        self.source_tokenizer = Tokenizer.from_file(str(directory/"tokenizer_src.json"))
+        self.target_tokenizer = Tokenizer.from_file(str(directory/"tokenizer_tgt.json"))
+        self.source_tokenizer.no_truncation()
+        self.source_tokenizer.no_padding()
+        self.target_tokenizer.no_truncation()
+        self.target_tokenizer.no_padding()
+        self.token_meta = json.loads((directory/"tokenizer_meta.json").read_text())
+        model = json.loads((directory/"config.json").read_text())
+        generation = json.loads((directory/"generation_config.json").read_text())
+        self.start_id = int(generation["decoder_start_token_id"])
+        self.eos_id = int(generation["eos_token_id"])
+        self.layers = model["decoder_layers"]
+        if config["generation"]["max_source_tokens"] > model["max_source_positions"] or config["generation"]["max_target_tokens"] > model["max_target_positions"]:
+            raise ValueError("Configured token budget exceeds the checkpoint's positional limits")
+        options = ort.SessionOptions()
+        options.intra_op_num_threads = config["runtime"]["threads"]
+        options.inter_op_num_threads = 1
+        options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+        options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        self.encoder,self.decoder,self.decoder_past = [ort.InferenceSession(str(directory/name),sess_options=options,
+                       providers=["CPUExecutionProvider"]) for name in
+                       ("encoder_model.onnx","decoder_model.onnx","decoder_with_past_model.onnx")]
+        for session in (self.decoder,self.decoder_past):
+            if len(session.get_outputs()) != 1 + 4*self.layers:
+                raise ValueError("ONNX decoder output layout differs from the inspected export")
+        self.metadata = {"model_id":config["model_id"],"model_revision":config["model_revision"],
+            "base_model_id":config["base_model_id"],"backend":"onnxruntime","quantization":"int8_dynamic",
+            "device":"cpu","providers":["CPUExecutionProvider"],"decoding":"greedy","batch_size":1,
+            "intra_op_threads":options.intra_op_num_threads,"inter_op_threads":1,
+            "graph_optimization":"ORT_ENABLE_ALL","trust_remote_code":False,"model_files_sha256":bundle["files"],
+            "packages":{name:importlib.metadata.version(name) for name in
+                        ("onnxruntime","numpy","tokenizers","indictranstoolkit","huggingface-hub")}}
 
     def measure(self, text, target):
-        # Keep length-probe entity mappings separate from the real batch processor.
         probe = self.Processor(inference=True)
-        prepared = probe.preprocess_batch([text], src_lang="eng_Latn", tgt_lang=target)
-        return len(self.tokenizer(prepared, truncation=False, padding=False)["input_ids"][0])
+        prepared = probe.preprocess_batch([text],src_lang="eng_Latn",tgt_lang=target)[0]
+        return len(self.source_tokenizer.encode(prepared).ids)
 
     def translate(self, text, target):
-        cfg = self.config
-        chunks = chunk_text(text, cfg["generation"]["max_source_tokens"], lambda value:self.measure(value,target))
+        cfg, np = self.config, self.np
+        chunks = chunk_text(text,cfg["generation"]["max_source_tokens"],lambda value:self.measure(value,target))
         records = []
-        batch_size = cfg["runtime"]["batch_size"]
-        for start in range(0,len(chunks),batch_size):
-            batch = chunks[start:start+batch_size]
-            prepared = self.processor.preprocess_batch(batch,src_lang="eng_Latn",tgt_lang=target)
-            inputs = self.tokenizer(prepared,truncation=False,padding="longest",return_tensors="pt",return_attention_mask=True).to(self.device)
-            lengths = inputs["attention_mask"].sum(dim=1).tolist()
-            if any(length > cfg["generation"]["max_source_tokens"] for length in lengths):
-                raise ValueError("Prepared input exceeded the source budget; inference was not truncated")
-            with self.torch.inference_mode():
-                outputs = self.model.generate(**inputs,do_sample=False,num_beams=cfg["generation"]["num_beams"],
-                             num_return_sequences=1,min_length=0,max_length=cfg["generation"]["max_target_tokens"],use_cache=True)
-            token_rows = outputs.detach().cpu().tolist()
-            decoded = self.tokenizer.batch_decode(outputs,skip_special_tokens=True,clean_up_tokenization_spaces=True)
-            translated = self.processor.postprocess_batch(decoded,lang=target)
-            for source, prepared_text, decoded_text, translated_text, tokens, count in zip(batch,prepared,decoded,translated,token_rows,lengths):
-                length = len([v for v in tokens if v != self.tokenizer.pad_token_id])
-                records.append({"source_text":source,"prepared_source_text":prepared_text,"decoded_text":decoded_text,
-                                "generated_token_ids":tokens,"translation_text":translated_text,"source_token_count":count,
-                                "output_token_count":length,"target_length_limit_reached":length >= cfg["generation"]["max_target_tokens"]})
+        for chunk in chunks:
+            processor = self.Processor(inference=True)
+            prepared = processor.preprocess_batch([chunk],src_lang="eng_Latn",tgt_lang=target)[0]
+            encoded = self.source_tokenizer.encode(prepared)
+            if len(encoded.ids) > cfg["generation"]["max_source_tokens"]:
+                raise ValueError("Input exceeded source budget; no truncation was applied")
+            if any(token < 0 or token >= self.token_meta["src_dict_size"] for token in encoded.ids):
+                raise ValueError("Source tokenizer produced an out-of-dictionary token; no silent UNK substitution")
+            input_ids = np.array([encoded.ids],dtype=np.int64)
+            mask = np.array([encoded.attention_mask],dtype=np.int64)
+            hidden = self.encoder.run(["last_hidden_state"],{"input_ids":input_ids,"attention_mask":mask})[0]
+            past = None
+
+            def step(last_token, first):
+                nonlocal past
+                feed = {"input_ids":np.array([[last_token]],dtype=np.int64),"encoder_attention_mask":mask}
+                if first:
+                    feed["encoder_hidden_states"] = hidden
+                    outputs = self.decoder.run(None,feed)
+                else:
+                    outputs = self.decoder_past.run(None,{**feed,**cached_feed(past,self.layers)})
+                scores = outputs[0][0,-1,:]
+                if not np.isfinite(scores).all():
+                    raise ValueError("Non-finite ONNX decoder logits")
+                past = list(outputs[1:])
+                token = int(np.argmax(scores))
+                if token >= self.token_meta["tgt_dict_size"]:
+                    raise ValueError("Decoder selected an out-of-dictionary target token")
+                return token
+
+            tokens, capped = greedy_tokens(step,self.start_id,self.eos_id,cfg["generation"]["max_target_tokens"])
+            decoded = self.target_tokenizer.decode(tokens,skip_special_tokens=True)
+            translated = processor.postprocess_batch([decoded],lang=target)[0]
+            records.append({"source_text":chunk,"prepared_source_text":prepared,"decoded_text":decoded,
+                "generated_token_ids":tokens,"translation_text":translated,"source_token_count":len(encoded.ids),
+                "output_token_count":len(tokens),"target_length_limit_reached":capped})
         return {"text":" ".join(row["translation_text"] for row in records),"segments":records,
                 "generation_issues":["target_generation_length_limit_reached"] if any(r["target_length_limit_reached"] for r in records) else []}
