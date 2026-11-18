@@ -1,7 +1,6 @@
 {
   "date": "2026-11-18",
   "python": "3.11.14",
-  "neural_execution": false,
   "repository_unittest_command": "python -m unittest discover -s tests -v",
   "repository_tests_passed": 46,
   "phase2_synthetic_tests_passed": 29,
@@ -30,11 +29,21 @@
     "note": "Incomplete translations and five source questions needing actual human adjudication correctly block the build. Acceptable English source records are not a finalized dataset."
   },
   "unrun_checks": [
-    "Full INT8 ONNX dependency environment installation/resolution",
-    "Pinned ONNX graph/external-weight download and tensor-precision inspection",
-    "Actual ONNX Runtime session loading and CPU translation",
-    "Actual tokenizer/classifier integration",
-    "Native-speaker ratings, corrections and source adjudication",
-    "Full reviewed multilingual build and downstream handoff"
-  ]
+    "Native semantic/terminology/fluency/answer judgments and corrections",
+    "Full-precision parity comparison",
+    "Exhaustive graph tensor-precision audit",
+    "Full multilingual generation, reviewed final build and downstream handoff",
+    "Peak model memory measurement; OS profiling was denied in the sandbox"
+  ],
+  "historical_preparation_neural_execution": false,
+  "neural_execution": true,
+  "pilot_translation_records": 20,
+  "pilot_successful_records": 20,
+  "pilot_valid_span_records": 2,
+  "human_judgments": 0,
+  "full_dataset_run_started": false,
+  "final_benchmark_emitted": false,
+  "dependency_environment_installed_and_pip_check_passed": true,
+  "actual_onnx_sessions_loaded": true,
+  "actual_language_classifier_executed": true
 }

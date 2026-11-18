@@ -1,4 +1,4 @@
-# Declared INT8 ONNX environment, Python >=3.11. Actual model integration is unrun.
+# Direct INT8 ONNX dependencies, Python >=3.11. See requirements-lock.txt for the executed pilot environment.
 onnxruntime==1.27.0
 transformers==4.57.6
 tokenizers==0.22.2

@@ -32,7 +32,7 @@ Do not add independently translated answers to the context. Exact alignment is a
 separate data-validation step; missing or ambiguous matches require human review.
 
 No Gemma/Gemini outputs or original API prompts were supplied or verified here.
-This file records the planned IndicTrans2 procedure, not an executed model run.
+This procedure was executed in the approved 20-record pilot on 18 November 2026. All translations completed; only 2/20 gold answers aligned to unique exact context spans. No human quality ratings were supplied.
 The earlier 200M/five-beam plan was never executed. This INT8 backend uses CPU,
 batch size 1 and greedy decoding following the inspected exporter interface:
 https://github.com/Hari31416/indictrans2-onnx-export/blob/c488d66bd1a59bcd419d246e6c2b85c17384d9bc/src/translate.py

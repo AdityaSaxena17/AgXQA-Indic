@@ -1,6 +1,6 @@
 # Phase 2 — AgXQA-Indic Benchmark Construction
 
-**Owner:** Saunak. **Preparation snapshot: 18 November 2026.** The English source audit and implementation are available. **IndicTrans2 translation has not run; zero translated QA records and zero human judgments have been produced.** The full multilingual benchmark and Phase 3/5 handoff remain pending. See [completion tracker](results/completion_tracker.json).
+**Owner:** Saunak. **Pilot executed: 18 November 2026.** The user-approved 1B INT8 ONNX pilot completed **20/20 translations in 42.99 seconds**, including loading/checksums. Language-ID checks matched all 20 target languages. Only **2/20 gold answers aligned to a unique exact translated-context span**; 18 need alignment review. Human judgments and final benchmark records remain zero. The full 8,744-record generation run has not started. See [pilot evidence](results/pilot_int8_2026-11-18.json), [ID-level checks](results/pilot_validation.csv) and [completion tracker](results/completion_tracker.json).
 
 The user selected **IndicTrans2 English→Indic 1B, dynamic INT8 ONNX**, replacing the earlier unexecuted 200M plan. Earlier planning notes suggested Gemma/Gemini translations might exist; no such files or provenance were supplied or found in this checkout. Their settings and results are unknown. This implementation records a local ONNX Runtime CPU workflow using the community export `hari31416/indictrans2-en-indic-1B-ONNX-int8` of `ai4bharat/indictrans2-en-indic-1B`. It does not retrospectively label any earlier output.
 
@@ -25,11 +25,11 @@ The three `agxqa-{train,validation,test}-2024-06-11.jsonl` files are verified ag
 | Tamil | ta | `tam_Taml` | 1,503 | 353 | 330 | 2,186 |
 | All languages | | | 7,515 | 1,765 | 1,650 | 10,930 |
 
-English counts were verified from downloaded bytes. Indic counts are **targets**, comprising 8,744 translated QA records. Currently no translated or finalized records exist.
+English counts were verified from downloaded bytes. Indic counts are **targets**, comprising 8,744 translated QA records. The actual pilot contains five validation questions per Indic language (20 translations); no finalized records exist.
 
 ## 4. Translation Methodology
 
-The checkpoint is a sequence-to-sequence translation model, accessed through its dynamic INT8 ONNX export with ONNX Runtime and IndicTransToolkit. Source and target tokenizers are loaded from the export's JSON files. Quantization was performed by the community exporter; this phase does not recalibrate or train weights. Its original base-weight revision is not identified, so `base_model_revision` is explicitly null. It uses source/target language conditioning, not a chat prompt. [translation_prompt.txt](prompts/translation_prompt.txt) records the exact planned conditioning procedure; chat prompt, API sampling temperature, paid API token consumption and API cost are not applicable (`null`). Execution duration is unmeasured until a run occurs.
+The checkpoint is a sequence-to-sequence translation model, accessed through its dynamic INT8 ONNX export with ONNX Runtime and IndicTransToolkit. Source and target tokenizers are loaded from the export's JSON files. Quantization was performed by the community exporter; this phase does not recalibrate or train weights. Its original base-weight revision is not identified, so `base_model_revision` is explicitly null. It uses source/target language conditioning, not a chat prompt. [translation_prompt.txt](prompts/translation_prompt.txt) records the exact planned conditioning procedure; chat prompt, API sampling temperature, paid API token consumption and API cost are not applicable (`null`). The actual pilot took 42.992904708 seconds, including model loading/checksums; this is not a full-dataset runtime estimate.
 
 Translate each context, question and **all** answer strings independently. The same context is translated once per target language/configuration/runtime and reused through a SQLite cache. Sentence segmentation followed by whitespace segmentation keeps actual preprocessed tokenizer inputs within 256 tokens. No input truncation is allowed. This retains normalized source words, but chunk boundaries can reduce discourse coherence; reviewers must inspect full paragraphs. Answers and questions can also be chunked if they exceed the budget.
 
@@ -57,9 +57,9 @@ Unit translations are retried at most three times, with one- and two-second dela
 | Seed | 42; exact reproducibility across devices is not guaranteed |
 | Remote model code | None executed; explicit graph/JSON file allowlist and SHA-256 manifest |
 
-[translation_config.yaml](configs/translation_config.yaml) and [config.json](config.json) contain identical settings. The default CLI uses JSON so non-model checks need only Python's standard library. Requirements declare a candidate environment; **the full translation dependency environment and neural integration have not been executed or validated**. Run manifests will record actual package versions, Python/platform/device, invocation, code/input hashes and measured per-session/total execution seconds. They do not estimate unrecorded costs.
+[translation_config.yaml](configs/translation_config.yaml) and [config.json](config.json) contain identical settings. The default CLI uses JSON so non-model checks need only Python's standard library. The separate Python 3.11 environment was installed, `pip check` passed, and actual ONNX/IndicTransToolkit/tokenizer/language-ID integration completed on 20 pilot records. [requirements-lock.txt](requirements-lock.txt) records the resolved environment. The run manifest records actual package versions, device, invocation and source/input/weight hashes. `config.json` is the exact pilot input; its initial preparation-status label is not a live execution tracker. The pilot report records actual execution status. They do not estimate unrecorded costs.
 
-The selected [community export](https://huggingface.co/hari31416/indictrans2-en-indic-1B-ONNX-int8) was public and ungated at preflight; a Hugging Face token is not required for public download. The official base checkpoint is separately gated. The downloader fetches only the pinned ONNX graphs, external weights and required JSON files, never repository Python. Every required file is hashed and verified before session creation. Weights have not been downloaded and actual CPU execution remains untested. A macOS arm64 Python 3.11 wheel for the exporter's ONNX Runtime 1.27.0 pin was verified in public package metadata; that wheel requires macOS 14+. Requirements are declared, not an installed/validated translation environment. The INT8 label is supplied by the exporter; graph tensors and translation quality have not yet been independently audited.
+The selected [community export](https://huggingface.co/hari31416/indictrans2-en-indic-1B-ONNX-int8) was public and ungated at preflight; a Hugging Face token is not required for public download. The official base checkpoint is separately gated. The downloader fetches only the pinned ONNX graphs, external weights and required JSON files, never repository Python. Every required file is hashed and verified before session creation. The pinned bundle was downloaded, checksummed and run successfully on this Mac CPU. The ten required files total **1,155,441,455 bytes** (about 1.16 GB); this is disk size, not peak RAM. A macOS arm64 Python 3.11 wheel for the exporter's ONNX Runtime 1.27.0 pin was verified in public package metadata; that wheel requires macOS 14+. Actual runtime integration passed the pilot. Integer quantization operator names were present in the graph files, but no exhaustive tensor-precision or full-precision parity audit was performed. Native translation quality remains unscored.
 
 ## 6. Dataset Construction Pipeline
 
@@ -110,7 +110,7 @@ Follow [annotation_guidelines.md](human_review/annotation_guidelines.md). Review
 | Saunak | Bengali | Same |
 | Dhiraj | Tamil | Same |
 
-Proposed sampling: 5% train (76), 10% validation (36), 100% test (330), seed 42, per language; the percentages are implementation choices, not requirements inferred from the original paper. Every flagged record also requires review. Current actual review coverage is **0%**, with four header-only target-language CSVs and five prefilled **unjudged** English source-review requests. Assignments are not completed annotations. Resolving English source errors requires real source adjudication in addition to Indic review.
+Proposed sampling: 5% train (76), 10% validation (36), 100% test (330), seed 42, per language; the percentages are implementation choices, not requirements inferred from the original paper. Every flagged record also requires review. Current actual review coverage is **0%**. The committed target-language CSVs remain templates and the five English source requests remain unjudged. Twenty additional unjudged pilot review requests were generated locally under `outputs/pilot-int8-2026-11-18/human_review/`; the small pilot cohort is requested in full before scale-up. Assignments are not completed annotations. Resolving English source errors requires real source adjudication in addition to Indic review.
 
 ## 10. Translation Quality Evaluation
 
@@ -124,7 +124,7 @@ Cohen's kappa is computed only for explicitly independent reviewers of the same 
 |---|---:|
 | Verified source QA records | 2,186 |
 | Distinct source contexts | 391 |
-| Translated QA records | 0 |
+| Translated QA records | 20 pilot validation records (5 per Indic language) |
 | Completed human judgments | 0 |
 | Final multilingual records emitted | 0 |
 | Source references with invalid offsets | 9 across 5 test questions |
@@ -137,7 +137,7 @@ See [dataset_statistics.json](results/dataset_statistics.json), [translation_rep
 
 The source questions `1170477`, `1174212`, `1183012`, `1181597` and `481` contain invalid answer offsets. `481` includes a placeholder-like gold string. The builder requires explicit English source review and keeps the original files/Phase 1 experiment intact. A corrected Phase 2 English benchmark is a new annotation version, requiring version disclosure in downstream comparisons.
 
-No translation-error taxonomy counts have yet been measured. [error_analysis.csv](results/error_analysis.csv) currently reports only actual English source flags. Human terminology, answer mismatch, grammar, meaning change, missing content and numerical errors can be entered in the review CSV's `error_categories` column. Analysis must distinguish alignment failure from incorrect translation and language heuristics from human-confirmed errors.
+Pilot automated QC found **17 missing exact answer matches, one ambiguous match, three unit-alias flags and two numerical-value flags**. These categories can overlap. [error_analysis.csv](results/error_analysis.csv) includes these measured flags and the five existing English source-offset flags. Human-confirmed translation-error taxonomy counts remain unmeasured. Human terminology, answer mismatch, grammar, meaning change, missing content and numerical errors can be entered in the review CSV's `error_categories` column. Analysis must distinguish alignment failure from incorrect translation and language heuristics from human-confirmed errors.
 
 ## 13. Data Leakage Prevention
 
@@ -147,28 +147,42 @@ The official dataset already overlaps across documents and verbatim contexts: **
 
 ## 14. Results and Visualizations
 
-Files under `results/` include the source preflight, per-record automated audit, header-only human evaluation table, actual source issue counts, machine-readable completion tracker and five required plots. At this stage `language_distribution.png` shows prepared English/source counts, `error_distribution.png` shows source issue flags, and translation-quality/span-correction/review-outcome figures explicitly state that observations are unavailable. No illustrative scores from the brief are used.
+Files under `results/` include the source preflight, per-record automated audit, header-only human evaluation table, actual source issue counts, machine-readable completion tracker and five required plots. The figures now show 2,186 prepared English rows plus five machine candidates per Indic language, actual automated issue counts, and raw answer-span validity. Human quality/review-outcome plots retain missing-observation notices; no after-correction curve exists. No illustrative scores from the brief are used.
 
-Preparation verification: **46 repository tests passed**, including 29 Phase 2 tests using synthetic data/fake translation backends and no neural execution. Shared synthetic validation/evaluation also passed. An actual source-only build preflight exited 2 and emitted no final files, correctly blocking missing translations and required source judgments. See [verification.json](results/verification.json); ONNX graph loading, real MT, language-classifier integration and human review remain unrun.
+Preparation verification: **46 repository tests passed**, including 29 Phase 2 tests using synthetic data/fake translation backends and no neural execution. Shared synthetic validation/evaluation also passed. An actual source-only build preflight exited 2 and emitted no final files, correctly blocking missing translations and required source judgments. See [verification.json](results/verification.json); Actual ONNX graph loading, 20-record MT, and language-classifier integration subsequently passed. Human review, corrections and full generation remain pending.
 
-After an actual run and review, regenerate reports from the preserved candidates and completed worksheets. The paired span plot will use the same accepted review-resolved IDs before/after; raw overall candidate validity and unresolved records remain in the report. This preparation is not a completed Phase 2 submission.
+The actual pilot produced the following observations. A valid exact span does not establish a semantically correct gold answer, and a missing span does not by itself prove a bad translation.
+
+| Language | Completed translations | Unique exact answer spans | Language-ID matches |
+|---|---:|---:|---:|
+| Hindi | 5/5 | 0/5 | 5/5 |
+| Marathi | 5/5 | 1/5 | 5/5 |
+| Bengali | 5/5 | 0/5 | 5/5 |
+| Tamil | 5/5 | 1/5 | 5/5 |
+| Total | 20/20 | 2/20 (10%) | 20/20 |
+
+Source IDs: `1174220`, `1169433`, `1183050`, `1183018`, `1169413`; all belong to validation. Raw outputs, translated question/context previews, environment freeze, logs and unjudged review forms are saved locally under `outputs/pilot-int8-2026-11-18/`. The preview file is `results/pilot_translations.jsonl` within that run directory. Aggregate reports and ID-only validation are committed; raw research text/weights remain local. The main statistics retain full target denominators, while the pilot summary reports completion against the 20 requested records.
+
+The model completed in 42.99 monotonic seconds. The macOS `time -l` wrapper could not collect peak memory because the sandbox denied `kern.clockrate`; the translation itself completed all records and the manifest/output hashes verified. Peak model memory is **unavailable**, not zero or an estimate. A separate timing-tool diagnostic did not rerun the model.
+
+**Do not scale this independent-answer-translation strategy to the full dataset yet.** Exact span validity was only 10% in this small, nonrepresentative pilot. An answer-projection or native human-alignment protocol must be evaluated first; no answers were inserted into contexts and no corrections fabricated. After actual review, regenerate reports from the preserved candidates and completed worksheets. The paired span plot will use the same accepted review-resolved IDs before/after; raw overall candidate validity and unresolved records remain in the report. This preparation is not a completed Phase 2 submission.
 
 ## 15. Limitations
 
-The selected community INT8 ONNX graphs and CPU path remain untested with actual model files. No repository Python is executed. ONNX sessions and external weight files can use substantially more RAM than the on-disk bundle size. Runtime and quality must be measured in a separately approved pilot. The source base-weight revision is unspecified, and greedy decoding differs from the earlier unrun five-beam proposal. Chunked independent field translation can lose coherence or produce answers that do not match the context; the pilot and native review are essential. Heuristics cannot certify semantics, fluency, terminology or unit equivalence. Original source offsets and document overlap need explicit handling. Human review, multilingual generation, final build, rights/redistribution review and downstream handoff remain pending. Phase 1's English-trained XLM-R model is also still pending; Phase 2 does not satisfy that separate prerequisite for Experiment 3A.
+The selected INT8 ONNX model ran successfully on CPU for the pilot, but only 2/20 gold answers aligned automatically. Native semantic quality, full-precision parity, full-dataset runtime and peak model RAM remain unmeasured. No repository Python is executed. ONNX sessions and external weight files can use substantially more RAM than the on-disk bundle size. The pilot runtime is measured; quality and generalization require further work before an approved full run. The source base-weight revision is unspecified, and greedy decoding differs from the earlier unrun five-beam proposal. Chunked independent field translation can lose coherence or produce answers that do not match the context; the pilot and native review are essential. Heuristics cannot certify semantics, fluency, terminology or unit equivalence. Original source offsets and document overlap need explicit handling. Human review, multilingual generation, final build, rights/redistribution review and downstream handoff remain pending. Phase 1's English-trained XLM-R model is also still pending; Phase 2 does not satisfy that separate prerequisite for Experiment 3A.
 
 ## 16. Reproducibility Instructions
 
-Run from the repository root, using Python 3.11 on this Mac. Keep translation dependencies separate from the Phase 1 environment. The installation below is a **recipe**, not a claim it was executed here:
+Run from the repository root, using Python 3.11 on this Mac. Keep translation dependencies separate from the Phase 1 environment. The separate environment was installed and validated for this pilot. Recreate its exact resolved Python 3.11/macOS environment with:
 
 ```sh
 python3.11 -m venv phase_02_multilingual_benchmark/.venv
-phase_02_multilingual_benchmark/.venv/bin/python -m pip install -r phase_02_multilingual_benchmark/requirements.txt
+phase_02_multilingual_benchmark/.venv/bin/python -m pip install -r phase_02_multilingual_benchmark/requirements-lock.txt
 mkdir -p phase_02_multilingual_benchmark/outputs
 phase_02_multilingual_benchmark/.venv/bin/python -m pip freeze > phase_02_multilingual_benchmark/outputs/environment.freeze.txt
 ```
 
-The declared pins are not a full transitive dependency lock; save the resolved environment and run manifest. Standard-library synthetic checks do not need translation dependencies:
+`requirements.txt` declares direct dependencies; `requirements-lock.txt` is the actual resolved pilot environment. Preserve the run manifest and environment freeze for later versions. Standard-library synthetic checks do not need translation dependencies:
 
 ```sh
 python3 -m unittest discover -s tests -v
@@ -216,7 +230,7 @@ python3 -m shared.validate data/agxqa_indic/final/shared/validation.jsonl
 python3 -m shared.validate data/agxqa_indic/final/shared/test.jsonl
 ```
 
-Validation scripts exit nonzero for missing full-benchmark coverage or failed checks; this is expected on a pilot or the present zero-translation snapshot. Until all required translations, source corrections and reviews exist, the build exits nonzero and writes a blocking report, with no final benchmark. Preserve/version earlier reports before regenerating them for a new candidate/review snapshot. A finished handoff requires final file hashes, license/source documentation, split counts, full review coverage disclosure, benchmark version and downstream owners' acknowledgment. Never commit authentication secrets, caches or large model weights. Raw research data publication requires checking source redistribution terms.
+Validation scripts exit nonzero for missing full-benchmark coverage or failed checks; this is expected on the present incomplete, unreviewed pilot snapshot. Until all required translations, source corrections and reviews exist, the build exits nonzero and writes a blocking report, with no final benchmark. Preserve/version earlier reports before regenerating them for a new candidate/review snapshot. A finished handoff requires final file hashes, license/source documentation, split counts, full review coverage disclosure, benchmark version and downstream owners' acknowledgment. Never commit authentication secrets, caches or large model weights. Raw research data publication requires checking source redistribution terms.
 
 ## 17. Contributors
 

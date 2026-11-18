@@ -1,5 +1,5 @@
-# Phase 2 preparation figures
+# Phase 2 observed pilot figures
 
-These figures were generated from the actual source/preparation report, without model inference. `language_distribution.png` displays 2,186 prepared English rows and zero Indic machine candidates; these are not final release counts. `error_distribution.png` displays five English questions flagged for invalid source offsets (nine answer references).
+The figures now use the actual approved 20-record INT8 pilot. `language_distribution.png` shows 2,186 prepared English records and five Indic candidates per language, not final release coverage. `answer_span_validity.png` shows raw exact-span validity: Hindi 0%, Marathi 20%, Bengali 0%, Tamil 20%. No human after-correction curve is available.
 
-`translation_quality.png`, `human_review_outcomes.png` and `answer_span_validity.png` contain explicit missing-measurement notices. They do not contain illustrative or estimated quality scores. Regenerate with `scripts/dataset_statistics.py --plots` after actual translation/review. Paired before/after figures will disclose the accepted review-resolved subset and excluded unresolved/rejected records.
+`error_distribution.png` includes actual pilot alignment/numeric/unit flags and the existing English source-offset flags. `translation_quality.png` and `human_review_outcomes.png` remain explicit missing-measurement notices because no human ratings or decisions exist. Language-ID agreement is not semantic quality. Regenerate from the preserved pilot candidates/reviews, not illustrative values.
