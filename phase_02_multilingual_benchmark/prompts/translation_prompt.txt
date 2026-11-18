@@ -1,0 +1,29 @@
+This run uses a supervised sequence-to-sequence translation checkpoint, not a chat API.
+There is no natural-language system/user prompt and no sampling temperature.
+
+Model: ai4bharat/indictrans2-en-indic-dist-200M
+Revision: 2cfd0a20057756d756bf3e53528f492afc52f91a
+Provider: local Hugging Face Transformers checkpoint
+Source tag: eng_Latn
+Target tags: hin_Deva (hi), mar_Deva (mr), ben_Beng (bn), tam_Taml (ta)
+
+Actual conditioning procedure:
+1. IndicProcessor(inference=True).preprocess_batch(source_segments,
+       src_lang="eng_Latn", tgt_lang=TARGET_TAG)
+2. AutoTokenizer(..., trust_remote_code=True, pinned revision), with truncation=False.
+3. model.generate(do_sample=False, num_beams=5, num_return_sequences=1,
+       min_length=0, max_length=256, use_cache=True)
+4. tokenizer.batch_decode(skip_special_tokens=True,
+       clean_up_tokenization_spaces=True)
+5. IndicProcessor.postprocess_batch(decoded, lang=TARGET_TAG)
+
+Translate context, question and every gold-answer string independently.
+Chunk contexts by English sentence boundaries, then whitespace if needed, using
+the actual preprocessed tokenizer length and a 256-token input budget. Retain all
+normalized source words. Join translated segments with one space. Preserve the
+decoded text, token IDs, segment boundaries and postprocessed output in raw logs.
+Do not add independently translated answers to the context. Exact alignment is a
+separate data-validation step; missing or ambiguous matches require human review.
+
+No Gemma/Gemini outputs or original API prompts were supplied or verified here.
+This file records the planned IndicTrans2 procedure, not an executed model run.

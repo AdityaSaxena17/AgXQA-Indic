@@ -1,0 +1,780 @@
+{
+  "status": "machine_translation_not_run",
+  "expected": {
+    "per_language": {
+      "train": 1503,
+      "validation": 353,
+      "test": 330
+    },
+    "per_language_total": 2186,
+    "translated_total": 8744,
+    "all_language_total": 10930
+  },
+  "observed": {
+    "en/train": {
+      "expected": 1503,
+      "candidate_rows": 1503,
+      "successful_translation_rows": 1503,
+      "translation_completion_rate": 1.0,
+      "valid_span_rows": 1503,
+      "span_validity_rate": 1.0
+    },
+    "en/validation": {
+      "expected": 353,
+      "candidate_rows": 353,
+      "successful_translation_rows": 353,
+      "translation_completion_rate": 1.0,
+      "valid_span_rows": 353,
+      "span_validity_rate": 1.0
+    },
+    "en/test": {
+      "expected": 330,
+      "candidate_rows": 330,
+      "successful_translation_rows": 330,
+      "translation_completion_rate": 1.0,
+      "valid_span_rows": 325,
+      "span_validity_rate": 0.9848484848484849
+    },
+    "hi/train": {
+      "expected": 1503,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "hi/validation": {
+      "expected": 353,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "hi/test": {
+      "expected": 330,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "mr/train": {
+      "expected": 1503,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "mr/validation": {
+      "expected": 353,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "mr/test": {
+      "expected": 330,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "bn/train": {
+      "expected": 1503,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "bn/validation": {
+      "expected": 353,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "bn/test": {
+      "expected": 330,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "ta/train": {
+      "expected": 1503,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "ta/validation": {
+      "expected": 353,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    },
+    "ta/test": {
+      "expected": 330,
+      "candidate_rows": 0,
+      "successful_translation_rows": 0,
+      "translation_completion_rate": 0.0,
+      "valid_span_rows": 0,
+      "span_validity_rate": null
+    }
+  },
+  "human_quality": {
+    "en": {
+      "review_judgments": 0,
+      "semantic_equivalence": null,
+      "fluency": null,
+      "terminology": null,
+      "answer_correctness": null,
+      "acceptance_without_correction_rate": null,
+      "correction_rate": null,
+      "rejection_rate": null
+    },
+    "hi": {
+      "review_judgments": 0,
+      "semantic_equivalence": null,
+      "fluency": null,
+      "terminology": null,
+      "answer_correctness": null,
+      "acceptance_without_correction_rate": null,
+      "correction_rate": null,
+      "rejection_rate": null
+    },
+    "mr": {
+      "review_judgments": 0,
+      "semantic_equivalence": null,
+      "fluency": null,
+      "terminology": null,
+      "answer_correctness": null,
+      "acceptance_without_correction_rate": null,
+      "correction_rate": null,
+      "rejection_rate": null
+    },
+    "bn": {
+      "review_judgments": 0,
+      "semantic_equivalence": null,
+      "fluency": null,
+      "terminology": null,
+      "answer_correctness": null,
+      "acceptance_without_correction_rate": null,
+      "correction_rate": null,
+      "rejection_rate": null
+    },
+    "ta": {
+      "review_judgments": 0,
+      "semantic_equivalence": null,
+      "fluency": null,
+      "terminology": null,
+      "answer_correctness": null,
+      "acceptance_without_correction_rate": null,
+      "correction_rate": null,
+      "rejection_rate": null
+    }
+  },
+  "human_review_coverage": {
+    "en/train": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 1503,
+      "coverage": 0.0
+    },
+    "en/validation": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 353,
+      "coverage": 0.0
+    },
+    "en/test": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 330,
+      "coverage": 0.0
+    },
+    "hi/train": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 1503,
+      "coverage": 0.0
+    },
+    "hi/validation": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 353,
+      "coverage": 0.0
+    },
+    "hi/test": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 330,
+      "coverage": 0.0
+    },
+    "mr/train": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 1503,
+      "coverage": 0.0
+    },
+    "mr/validation": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 353,
+      "coverage": 0.0
+    },
+    "mr/test": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 330,
+      "coverage": 0.0
+    },
+    "bn/train": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 1503,
+      "coverage": 0.0
+    },
+    "bn/validation": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 353,
+      "coverage": 0.0
+    },
+    "bn/test": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 330,
+      "coverage": 0.0
+    },
+    "ta/train": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 1503,
+      "coverage": 0.0
+    },
+    "ta/validation": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 353,
+      "coverage": 0.0
+    },
+    "ta/test": {
+      "reviewed_unique_ids": 0,
+      "total_expected": 330,
+      "coverage": 0.0
+    }
+  },
+  "cohens_kappa": null,
+  "kappa_note": "Only independent reviewers rating the same language/examples can establish agreement; one reviewer per language does not.",
+  "source_leakage": {
+    "cross_split_original_ids": [],
+    "cross_split_reference_document_groups": 39,
+    "cross_split_exact_context_groups": 207,
+    "document_disjoint": false,
+    "note": "Official splits are preserved. Existing document/context overlap is reported, never hidden by split-prefixed document IDs."
+  },
+  "new_model_execution_by_reporting": false,
+  "quality_rating_denominator": "All submitted human judgments; coverage counts unique original IDs.",
+  "paired_span_validity": {
+    "hi": {
+      "accepted_review_resolved_pairs": 0,
+      "reviewed_unresolved_records": 0,
+      "before_valid_rows": 0,
+      "after_valid_rows": 0,
+      "denominator_note": "Same review-resolved IDs before/after; excludes rejects and unresolved reviews. Not full-dataset coverage."
+    },
+    "mr": {
+      "accepted_review_resolved_pairs": 0,
+      "reviewed_unresolved_records": 0,
+      "before_valid_rows": 0,
+      "after_valid_rows": 0,
+      "denominator_note": "Same review-resolved IDs before/after; excludes rejects and unresolved reviews. Not full-dataset coverage."
+    },
+    "bn": {
+      "accepted_review_resolved_pairs": 0,
+      "reviewed_unresolved_records": 0,
+      "before_valid_rows": 0,
+      "after_valid_rows": 0,
+      "denominator_note": "Same review-resolved IDs before/after; excludes rejects and unresolved reviews. Not full-dataset coverage."
+    },
+    "ta": {
+      "accepted_review_resolved_pairs": 0,
+      "reviewed_unresolved_records": 0,
+      "before_valid_rows": 0,
+      "after_valid_rows": 0,
+      "denominator_note": "Same review-resolved IDs before/after; excludes rejects and unresolved reviews. Not full-dataset coverage."
+    }
+  },
+  "error_counts": {
+    "invalid_original_gold_offset_requires_source_review": 5
+  },
+  "human_error_counts": {},
+  "translation_configuration": {
+    "phase": 2,
+    "status": "implementation_prepared_translation_not_run",
+    "seed": 42,
+    "owner": "Saunak",
+    "dataset": "msu-ceco/agxqa_v1",
+    "dataset_revision": "9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c",
+    "source_dir": "phase_02_multilingual_benchmark/data/english",
+    "languages": [
+      "en",
+      "hi",
+      "mr",
+      "bn",
+      "ta"
+    ],
+    "model_id": "ai4bharat/indictrans2-en-indic-dist-200M",
+    "model_revision": "2cfd0a20057756d756bf3e53528f492afc52f91a",
+    "toolkit_version": "1.1.1",
+    "provider": "local_Hugging_Face_checkpoint",
+    "source_language_tag": "eng_Latn",
+    "target_language_tags": {
+      "hi": "hin_Deva",
+      "mr": "mar_Deva",
+      "bn": "ben_Beng",
+      "ta": "tam_Taml"
+    },
+    "generation": {
+      "do_sample": false,
+      "num_beams": 5,
+      "num_return_sequences": 1,
+      "max_source_tokens": 256,
+      "max_target_tokens": 256,
+      "temperature": null
+    },
+    "runtime": {
+      "dtype": "float32",
+      "attention": "eager",
+      "device": "auto",
+      "batch_size": 4,
+      "threads": 4,
+      "retry_attempts": 3
+    },
+    "review_policy": {
+      "train_fraction": 0.05,
+      "validation_fraction": 0.1,
+      "test_fraction": 1.0,
+      "fractions_origin": "proposed implementation choices; user requested sampled train/validation and full test review",
+      "require_resolution_of_all_automated_flags": true
+    },
+    "raw_output_dir": "data/agxqa_indic/raw_translations",
+    "candidate_output_dir": "phase_02_multilingual_benchmark/outputs/candidates",
+    "review_dir": "phase_02_multilingual_benchmark/human_review",
+    "final_output_dir": "data/agxqa_indic/final",
+    "human_reviewed_dir": "data/agxqa_indic/human_reviewed",
+    "notes": [
+      "Selected by user: IndicTrans2 distilled 200M. Not Gemma/Gemini; prior outputs were not supplied.",
+      "The selected checkpoint is gated; accept its Hugging Face conditions and authenticate locally before downloads.",
+      "No chat prompt or paid API sampling temperature applies. Language tags and beam decoding are recorded.",
+      "Keep original IDs/splits; do not insert answer translations into contexts to manufacture extractability.",
+      "All original answer references retained; invalid English gold annotations require recorded human adjudication."
+    ]
+  },
+  "execution_metadata": null,
+  "coverage": {
+    "expected_records": 10930,
+    "observed_unique_records": 2186,
+    "missing_pair_count": 8744,
+    "missing_pair_examples": [
+      {
+        "original_id": "0774be0a3f534d62a993efe4833446ba",
+        "language": "bn"
+      },
+      {
+        "original_id": "0774be0a3f534d62a993efe4833446ba",
+        "language": "hi"
+      },
+      {
+        "original_id": "0774be0a3f534d62a993efe4833446ba",
+        "language": "mr"
+      },
+      {
+        "original_id": "0774be0a3f534d62a993efe4833446ba",
+        "language": "ta"
+      },
+      {
+        "original_id": "0c1f051903f946c09415a89671f86a04",
+        "language": "bn"
+      },
+      {
+        "original_id": "0c1f051903f946c09415a89671f86a04",
+        "language": "hi"
+      },
+      {
+        "original_id": "0c1f051903f946c09415a89671f86a04",
+        "language": "mr"
+      },
+      {
+        "original_id": "0c1f051903f946c09415a89671f86a04",
+        "language": "ta"
+      },
+      {
+        "original_id": "1",
+        "language": "bn"
+      },
+      {
+        "original_id": "1",
+        "language": "hi"
+      },
+      {
+        "original_id": "1",
+        "language": "mr"
+      },
+      {
+        "original_id": "1",
+        "language": "ta"
+      },
+      {
+        "original_id": "10",
+        "language": "bn"
+      },
+      {
+        "original_id": "10",
+        "language": "hi"
+      },
+      {
+        "original_id": "10",
+        "language": "mr"
+      },
+      {
+        "original_id": "10",
+        "language": "ta"
+      },
+      {
+        "original_id": "100",
+        "language": "bn"
+      },
+      {
+        "original_id": "100",
+        "language": "hi"
+      },
+      {
+        "original_id": "100",
+        "language": "mr"
+      },
+      {
+        "original_id": "100",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007082",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007082",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007082",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007082",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007087",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007087",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007087",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007087",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007218",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007218",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007218",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007218",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007220",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007220",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007220",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007220",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007224",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007224",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007224",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007224",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007225",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007225",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007225",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007225",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007288",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007288",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007288",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007288",
+        "language": "ta"
+      },
+      {
+        "original_id": "1007637",
+        "language": "bn"
+      },
+      {
+        "original_id": "1007637",
+        "language": "hi"
+      },
+      {
+        "original_id": "1007637",
+        "language": "mr"
+      },
+      {
+        "original_id": "1007637",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008081",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008081",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008081",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008081",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008104",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008104",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008104",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008104",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008110",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008110",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008110",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008110",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008111",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008111",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008111",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008111",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008115",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008115",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008115",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008115",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008116",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008116",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008116",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008116",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008158",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008158",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008158",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008158",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008159",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008159",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008159",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008159",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008160",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008160",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008160",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008160",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008161",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008161",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008161",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008161",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008162",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008162",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008162",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008162",
+        "language": "ta"
+      },
+      {
+        "original_id": "1008539",
+        "language": "bn"
+      },
+      {
+        "original_id": "1008539",
+        "language": "hi"
+      },
+      {
+        "original_id": "1008539",
+        "language": "mr"
+      },
+      {
+        "original_id": "1008539",
+        "language": "ta"
+      }
+    ],
+    "extra_pairs": []
+  }
+}

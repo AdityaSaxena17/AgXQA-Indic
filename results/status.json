@@ -12,7 +12,7 @@
   },
   "phases": {
     "1": "partial_agroberta_measured_xlmr_pending",
-    "2": "pending_review",
+    "2": "implementation_prepared_translation_and_human_review_not_run",
     "3": "pending",
     "4": "pending",
     "5": "pending",

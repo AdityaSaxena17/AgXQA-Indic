@@ -1,7 +1,11 @@
 {
   "phase": 2,
-  "status": "pending",
+  "status": "implementation_prepared_translation_not_run",
   "seed": 42,
+  "owner": "Saunak",
+  "dataset": "msu-ceco/agxqa_v1",
+  "dataset_revision": "9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c",
+  "source_dir": "phase_02_multilingual_benchmark/data/english",
   "languages": [
     "en",
     "hi",
@@ -9,10 +13,50 @@
     "bn",
     "ta"
   ],
-  "inputs": [],
-  "output_dir": "outputs/phase_02_multilingual_benchmark",
-  "model_id": null,
-  "model_revision": null,
-  "dataset_revision": null,
-  "notes": "Starter only. Resolve inputs and hyperparameters before execution."
+  "model_id": "ai4bharat/indictrans2-en-indic-dist-200M",
+  "model_revision": "2cfd0a20057756d756bf3e53528f492afc52f91a",
+  "toolkit_version": "1.1.1",
+  "provider": "local_Hugging_Face_checkpoint",
+  "source_language_tag": "eng_Latn",
+  "target_language_tags": {
+    "hi": "hin_Deva",
+    "mr": "mar_Deva",
+    "bn": "ben_Beng",
+    "ta": "tam_Taml"
+  },
+  "generation": {
+    "do_sample": false,
+    "num_beams": 5,
+    "num_return_sequences": 1,
+    "max_source_tokens": 256,
+    "max_target_tokens": 256,
+    "temperature": null
+  },
+  "runtime": {
+    "dtype": "float32",
+    "attention": "eager",
+    "device": "auto",
+    "batch_size": 4,
+    "threads": 4,
+    "retry_attempts": 3
+  },
+  "review_policy": {
+    "train_fraction": 0.05,
+    "validation_fraction": 0.1,
+    "test_fraction": 1.0,
+    "fractions_origin": "proposed implementation choices; user requested sampled train/validation and full test review",
+    "require_resolution_of_all_automated_flags": true
+  },
+  "raw_output_dir": "data/agxqa_indic/raw_translations",
+  "candidate_output_dir": "phase_02_multilingual_benchmark/outputs/candidates",
+  "review_dir": "phase_02_multilingual_benchmark/human_review",
+  "final_output_dir": "data/agxqa_indic/final",
+  "human_reviewed_dir": "data/agxqa_indic/human_reviewed",
+  "notes": [
+    "Selected by user: IndicTrans2 distilled 200M. Not Gemma/Gemini; prior outputs were not supplied.",
+    "The selected checkpoint is gated; accept its Hugging Face conditions and authenticate locally before downloads.",
+    "No chat prompt or paid API sampling temperature applies. Language tags and beam decoding are recorded.",
+    "Keep original IDs/splits; do not insert answer translations into contexts to manufacture extractability.",
+    "All original answer references retained; invalid English gold annotations require recorded human adjudication."
+  ]
 }
