@@ -9,3 +9,8 @@ checkpoints/
 *.safetensors
 *.pt
 .DS_Store
+
+# Track checkpoint documentation, never checkpoint weights.
+!phase_01_original_baseline/checkpoints/
+phase_01_original_baseline/checkpoints/*
+!phase_01_original_baseline/checkpoints/README.md

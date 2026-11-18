@@ -1,0 +1,8 @@
+model,status,evaluation_protocol,exact_match,f1,training_time_seconds,total_parameters,trainable_parameters,notes
+AgRoBERTa (published),published_reference,paper_reported,55.15,78.89,,,,Published values; not measured by this project
+AgRoBERTa + SQuAD initialization,measured_before_finetuning,squad_v1_english,36.666666666666664,64.14534639420037,,,,Agricultural backbone plus existing public SQuAD adapter/head
+AgRoBERTa (reimplementation),measured,squad_v1_english,54.24242424242424,78.22565449019338,5296.853332040831,125541698,896066,20 epochs; final checkpoint; not original authors weights
+XLM-R Base,not_run,,,,,,,No measured scores or checkpoint in this contribution
+RoBERTa Base,not_run,,,,,,,No measured scores or checkpoint in this contribution
+BERT Base,not_run,,,,,,,No measured scores or checkpoint in this contribution
+DistilBERT,not_run,,,,,,,No measured scores or checkpoint in this contribution

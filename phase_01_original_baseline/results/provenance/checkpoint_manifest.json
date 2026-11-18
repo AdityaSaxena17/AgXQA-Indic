@@ -1,0 +1,59 @@
+{
+  "status": "local_only_not_uploaded",
+  "public_url": null,
+  "source_run_id": "reproduction-2026-11-17-mps",
+  "relative_checkpoint": "training/final",
+  "requires_backbone": "msu-ceco/roberta-ft-on-agextcorpus-2023-12-10_v2",
+  "backbone_revision": "bdfdd689aede30b4d7d84cb6e267b98a88d58e40",
+  "files": {
+    "tokenizer_config.json": {
+      "bytes": 1244,
+      "sha256": "1cc495729ab4be49bbc39e5bcda9e575ae843478a52c8aa83bea784dfb955f70"
+    },
+    "special_tokens_map.json": {
+      "bytes": 957,
+      "sha256": "b4963780888868fc561c6e11408119d66483df8bd33a1fafe40d45cb2e53b89c"
+    },
+    "optimizer.pt": {
+      "bytes": 7209995,
+      "sha256": "5200f5227edddadebb65c0a9785d69479e103010bf460f675f2fb3a6a10cb73c"
+    },
+    "model_head.safetensors": {
+      "bytes": 6312,
+      "sha256": "625cb0d36dad7b1f072dbd841a0d7b3cd399a750fb478a2cc5d749d54c8b9fb3"
+    },
+    "tokenizer.json": {
+      "bytes": 3558907,
+      "sha256": "92b5773af1014f186e15097983393121e0a1c57e4ea66e8ea6f606c3abe39516"
+    },
+    "training_state.json": {
+      "bytes": 43,
+      "sha256": "660aeb388195c948cbdafd387d4980a8125049929405481ffe7c4a778975c7f0"
+    },
+    "adapter.safetensors": {
+      "bytes": 3584392,
+      "sha256": "9e54e800efa17b1bfe40e3f20b9015f2ffea0a09b9d7c77d48b14b5cb8aa3922"
+    },
+    "merges.txt": {
+      "bytes": 456318,
+      "sha256": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5"
+    },
+    "training_metadata.json": {
+      "bytes": 24409,
+      "sha256": "86094bf39a458c898bfd8cd72259381cf346d6e3b64b571be72935ec6ffeebd0"
+    },
+    "adapter_config.json": {
+      "bytes": 1117,
+      "sha256": "c218409518b1309dd0f3b1cb0d1c5cd99225ebd103887df1c6e2c29dd77ae272"
+    },
+    "vocab.json": {
+      "bytes": 798293,
+      "sha256": "ed19656ea1707df69134c4af35c8ceda2cc9860bf2c3495026153a133670ab5e"
+    },
+    "head_config.json": {
+      "bytes": 396,
+      "sha256": "11a2c653e1d29ef5a33ebf1c0256ddc5158fd2cd89e46a0b4a320738da626a5b"
+    }
+  },
+  "weights_in_git": false
+}

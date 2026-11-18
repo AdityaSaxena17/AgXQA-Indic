@@ -1,4 +1,6 @@
 # Evaluation protocol v1
+
+Phase 1's original-paper comparison is separately labeled **`squad_v1_english`**, with English article removal and ASCII punctuation deletion. Its 54.24% EM / 78.23% F1 must not be mixed with this shared multilingual protocol. A metric-only rescore of the same frozen predictions under the shared definitions below is 51.52% EM / 78.24% F1; see [Phase 1 protocol notes](../phase_01_original_baseline/README.md#9-evaluation-metrics). The shared metric implementation is unchanged.
 EM and F1 use NFC normalization, Unicode casefold, punctuation replaced by spaces, and collapsed whitespace. Token F1 uses multiset overlap and whitespace tokens; combining marks are retained, and English articles are not removed. Empty/empty scores 1, empty/nonempty scores 0. For multiple gold spans, maximize each metric over references. Report scores on a 0–100 scale. This is a transparent shared protocol, not a claim of compatibility with the original paper's scorer; record any baseline differences.
 
 Evaluation requires exactly one split and exactly one prediction for each (id, language). Missing, extra and duplicate predictions fail, preventing silent optimistic scores. Micro averages weight examples; macro averages weight languages equally. Language gap is English F1 minus target F1 in percentage points on matched IDs only, with paired counts.

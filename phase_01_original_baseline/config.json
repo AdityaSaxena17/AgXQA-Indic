@@ -1,18 +1,15 @@
 {
   "phase": 1,
-  "status": "pending",
+  "status": "partial",
   "seed": 42,
   "languages": [
-    "en",
-    "hi",
-    "mr",
-    "bn",
-    "ta"
+    "en"
   ],
   "inputs": [],
   "output_dir": "outputs/phase_01_original_baseline",
-  "model_id": null,
-  "model_revision": null,
-  "dataset_revision": null,
-  "notes": "Starter only. Resolve inputs and hyperparameters before execution."
+  "model_id": "msu-ceco/roberta-ft-on-agextcorpus-2023-12-10_v2",
+  "model_revision": "bdfdd689aede30b4d7d84cb6e267b98a88d58e40",
+  "dataset_revision": "9fb0cf2a6d03ccfccbd67d5966179b43b5b77e2c",
+  "notes": "AgRoBERTa reimplementation complete; mandatory English XLM-R is not run. This JSON remains a planning summary; executable scripts use the YAML config.",
+  "actual_config": "configs/baseline_config.yaml"
 }

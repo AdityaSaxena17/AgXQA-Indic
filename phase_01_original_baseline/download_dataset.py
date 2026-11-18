@@ -1,11 +1,9 @@
-"""Implementation starter for phase 1: download_dataset. See README.md."""
-import argparse
+"""Compatibility entry point; implementation is in scripts/download_dataset.py."""
+import runpy
+import sys
+from pathlib import Path
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', default='phase_01_original_baseline/config.json')
-    parser.parse_args()
-    parser.exit(2, 'Pending implementation: download_dataset. Follow the phase README and record real artifacts.\n')
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    directory = Path(__file__).resolve().parent / "scripts"
+    sys.path.insert(0, str(directory))
+    runpy.run_path(str(directory / "download_dataset.py"), run_name="__main__")
